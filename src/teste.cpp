@@ -69,8 +69,8 @@ void displayCallback()
   /** Limpa a janela APENAS uma vez */
   glClear(GL_COLOR_BUFFER_BIT);
 
-  Point p = Point(0,1,0);
-  Point r = Point(1,1,1);
+  Point p = Point(0,0,1);
+  Point r = Point(1,1,0);
   Point o = Point(0,0,0);
 
   glColor3f(0.0f, 0.0f, 0.0f);
@@ -88,7 +88,7 @@ void displayCallback()
   glLoadIdentity();
   gluLookAt(3.0, 2.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   drawWCAxes();
-  p.rotate(o, 120, r);
+  p.rotate(o, 90, r);
   glBegin(GL_POINTS);
     glVertex3f(p.getX(), p.getY(), p.getZ());
   glEnd();

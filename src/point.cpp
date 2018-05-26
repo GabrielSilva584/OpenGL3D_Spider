@@ -32,13 +32,18 @@ void Point::rotate(Point O, GLfloat deg, Point dir){
         h1 = sqrt( pow(Zref,2) + pow(Xref,2) );
         angle1 = acos(Zref/h1);
         if(Xref < 0) angle1 = -angle1;
-    }else angle1 = 0;
+    }else{
+        angle1 = 0;
+        h1 = Zref;
+    }
 
     if(Yref != 0){
         h2 = sqrt( pow(Zref,2) + pow(Yref,2) + pow(Xref,2) );
-        angle2 = acos(Zref/h2);
+        angle2 = acos(h1/h2);
         if(Yref < 0) angle2 = -angle2;
     }else angle2 = 0;
+
+    printf("%f %f\n", 180*angle1/PI, 180*angle2/PI);
 
     if(angle1 != 0){
         //rotacao em Y para zerar Xref
@@ -87,9 +92,9 @@ void Point::rotate(Point O, GLfloat deg, Point dir){
         X = - Zold*sin(-angle1) + Xold*cos(-angle1);
     }
 
-    if(X < 0.00001) X = 0;
-    if(Y < 0.00001) Y = 0;
-    if(Z < 0.00001) Z = 0;
+    if(abs(X) < 0.00001) X = 0;
+    if(abs(Y) < 0.00001) Y = 0;
+    if(abs(Z) < 0.00001) Z = 0;
     print();
 
     this->translate(O.getX(),O.getY(), O.getZ());
