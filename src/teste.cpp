@@ -5,7 +5,7 @@
 #include <iostream>
 #include <GL/glut.h>
 #include "point.h"
-#include "leg.h"
+#include "spider.h"
 
 int width = 1000;
 int height = 500;
@@ -13,7 +13,7 @@ int height = 500;
 Point eye = Point(3.0, 5.0, 5.0);
 Point target = Point(0.0, 0.0, 0.0);
 
-Leg *test;
+Spider *test;
 
 /**
  * @desc Desenha eixos de um sistema de coordenadas.
@@ -223,7 +223,7 @@ int main(int argc, char **argv)
 	glutCreateWindow("Duas viewports");
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-	test = new Leg(Point(1,1,1), 45, -15, 90, 30, 4, 4, false, false);
+	test = new Spider(Point(0,1,0));
 
 	/** Passo 2: Registra callbacks da OpenGl */
 	glutDisplayFunc(displayCallback);

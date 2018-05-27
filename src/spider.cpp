@@ -4,55 +4,46 @@
 Spider::Spider(){}
 
 Spider::Spider(Point pos){
-    Point tmp, tmp2;
+    Point tmp, tmp2, o;
+
+    o = Point(0.0, 0.0, 0.0);
 
     this->pos = pos;
     this->destiny = pos;
 
-    tmp = Point(pos.getX(), pos.getY() + BODY_SIZE1 + BODY_SIZE2);
-    body1 = Circle(pos, BODY_SIZE1);
-    body2 = Circle(tmp, BODY_SIZE2);
-
-    glColor3f(0.0f, 0.0f, 0.0f);
-    tmp = Point(pos.getX() - 2*BODY_SIZE1/10, pos.getY() - 2*BODY_SIZE1/3);
-    l_eye = Circle(tmp, BODY_SIZE1/4);
-    tmp = Point(pos.getX() + 2*BODY_SIZE1/10, pos.getY() - 2*BODY_SIZE1/3);
-    r_eye = Circle(tmp, BODY_SIZE1/4);
-    glColor3f(1.0f, 1.0f, 1.0f);
-
-    tmp = Point(pos.getX() + BODY_SIZE1, pos.getY());
+    tmp = Point(0, 0, BODY_SIZE1);
 
     tmp2 = tmp;
-    tmp2.rotate(pos, 180-EXT_LEG_ANGLE);
-    ext_leg_l = Leg(tmp2, EXT_LEG_ANGLE, EXT_KNEE_ANGLE, EXT_LEG_SIZE1, EXT_LEG_SIZE2, true, false);
+    tmp2.rotate(o, 180-LEG1_ANGLEA, Point(0.0, 1.0, 0.0));
+    leg_l1 = Leg(tmp2, LEG1_ANGLEA, 180-LEG_ANGLEAX, -LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, true, false);
 
     tmp2 = tmp;
-    tmp2.rotate(pos, EXT_LEG_ANGLE);
-    ext_leg_r = Leg(tmp2, EXT_LEG_ANGLE, EXT_KNEE_ANGLE, EXT_LEG_SIZE1, EXT_LEG_SIZE2, false, true);
+    tmp2.rotate(o, LEG1_ANGLEA, Point(0.0, 1.0, 0.0));
+    leg_r1 = Leg(tmp2, LEG1_ANGLEA, LEG_ANGLEAX, LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, false, true);
 
     tmp2 = tmp;
-    tmp2.rotate(pos, 180-INT_LEG_ANGLE1);
-    int_leg_l1 = Leg(tmp2, INT_LEG_ANGLE1, INT_KNEE_ANGLE, INT_LEG1_SIZE1, INT_LEG1_SIZE2, true, true);
+    tmp2.rotate(o, 180-LEG2_ANGLEA, Point(0.0, 1.0, 0.0));
+    leg_l2 = Leg(tmp2, LEG2_ANGLEA, 180-LEG_ANGLEAX, -LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, true, true);
 
     tmp2 = tmp;
-    tmp2.rotate(pos, INT_LEG_ANGLE1);
-    int_leg_r1 = Leg(tmp2, INT_LEG_ANGLE1, INT_KNEE_ANGLE, INT_LEG1_SIZE1, INT_LEG1_SIZE2, false, false);
+    tmp2.rotate(o, LEG2_ANGLEA, Point(0.0, 1.0, 0.0));
+    leg_r2 = Leg(tmp2, LEG2_ANGLEA, LEG_ANGLEAX, LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, false, false);
 
     tmp2 = tmp;
-    tmp2.rotate(pos, 180-INT_LEG_ANGLE2);
-    int_leg_l2 = Leg(tmp2, INT_LEG_ANGLE2, INT_KNEE_ANGLE, INT_LEG2_SIZE1, INT_LEG2_SIZE2, true, false);
+    tmp2.rotate(o, 180-LEG3_ANGLEA, Point(0.0, 1.0, 0.0));
+    leg_l3 = Leg(tmp2, LEG3_ANGLEA, 180-LEG_ANGLEAX, -LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, true, false);
 
     tmp2 = tmp;
-    tmp2.rotate(pos, INT_LEG_ANGLE2);
-    int_leg_r2 = Leg(tmp2, INT_LEG_ANGLE2, INT_KNEE_ANGLE, INT_LEG2_SIZE1, INT_LEG2_SIZE2, false, true);
+    tmp2.rotate(o, LEG3_ANGLEA, Point(0.0, 1.0, 0.0));
+    leg_r3 = Leg(tmp2, LEG3_ANGLEA, LEG_ANGLEAX, LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, false, true);
 
     tmp2 = tmp;
-    tmp2.rotate(pos, 180-INT_LEG_ANGLE3);
-    int_leg_l3 = Leg(tmp2, INT_LEG_ANGLE3, INT_KNEE_ANGLE, INT_LEG3_SIZE1, INT_LEG3_SIZE2, true, true);
+    tmp2.rotate(o, 180-LEG4_ANGLEA, Point(0.0, 1.0, 0.0));
+    leg_l4 = Leg(tmp2, LEG4_ANGLEA, 180-LEG_ANGLEAX, -LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, true, true);
 
     tmp2 = tmp;
-    tmp2.rotate(pos, INT_LEG_ANGLE3);
-    int_leg_r3 = Leg(tmp2, INT_LEG_ANGLE3, INT_KNEE_ANGLE, INT_LEG3_SIZE1, INT_LEG3_SIZE2, false, false);
+    tmp2.rotate(o, LEG4_ANGLEA, Point(0.0, 1.0, 0.0));
+    leg_r4 = Leg(tmp2, LEG4_ANGLEA, LEG_ANGLEAX, LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, false, false);
 
     animationTime = 0;
     isAnimated = true;
@@ -63,7 +54,7 @@ void Spider::walkTo(Point destiny){
 }
 
 void Spider::update(GLfloat delta_temp){
-    if(GLint(pos.getX() + tx) != destiny.getX() || GLint(pos.getY() + ty) != destiny.getY()){
+    /*if(GLint(pos.getX() + tx) != destiny.getX() || GLint(pos.getY() + ty) != destiny.getY()){
         
         //calculando valor unitário de direção
         GLfloat dx = destiny.getX() - pos.getX() - tx;
@@ -107,32 +98,33 @@ void Spider::update(GLfloat delta_temp){
         int_leg_r3.update(delta_temp);
         animationTime += delta_temp;
 	    }
-    }
+    }*/
 
 }
 
 void Spider::draw(){
     glPushMatrix();
 
-    glTranslated(pos.getX() + tx, pos.getY() + ty, 0);
-    glRotated(rot, 0.0, 0.0, -1.0);
-    glScaled(sx, sy, 1);
-    glTranslated(-pos.getX(), -pos.getY(), 0);
+    glTranslatef(pos.getX() + tx, pos.getY() + ty, pos.getZ() + tz);
+    glRotatef(rot_y, 0.0, 1.0, 0.0);
+    glScalef(sx, sy, sz);
 
-    body1.draw();
-    body2.draw();
-    glColor4f(0.0, 0.0, 0.0, 1.0);
-    l_eye.draw();
-    r_eye.draw();
-    glColor4f(1.0, 1.0, 1.0, 1.0);
-    ext_leg_r.draw();
-    ext_leg_l.draw();
-    int_leg_r1.draw();
-    int_leg_l1.draw();
-    int_leg_r2.draw();
-    int_leg_l2.draw();
-    int_leg_r3.draw();
-    int_leg_l3.draw();
+    leg_r1.draw();
+    leg_l1.draw();
+    leg_r2.draw();
+    leg_l2.draw();
+    leg_r3.draw();
+    leg_l3.draw();
+    leg_r4.draw();
+    leg_l4.draw();
+
+    glutWireSphere(BODY_SIZE1, DETAIL_RATE, DETAIL_RATE);
+
+    glTranslatef(-BODY_INTERSECTION*(BODY_SIZE1+BODY_SIZE2), 0.0, 0.0);
+
+    glutWireSphere(BODY_SIZE2, DETAIL_RATE, DETAIL_RATE);
+
+    glTranslatef(BODY_INTERSECTION*(BODY_SIZE1+BODY_SIZE2), 0.0, 0.0);
 
     glPopMatrix();
 }
