@@ -9,6 +9,9 @@
 int width = 500;
 int height = 500;
 
+Point eye = Point(3.0, 5.0, 5.0);
+Point target = Point(0.0, 0.0, 0.0);
+
 /**
  * @desc Desenha eixos de um sistema de coordenadas.
  * @param {float*} basePoint Ponto de origem de um sistema de coordenadas.
@@ -20,7 +23,22 @@ void drawAxes(float *basePoint, float *i, float *j, float *k)
 {
   float currentColor[4];
   /** Armazena cor atual */
-  glGetFloatv(GL_CURRENT_COLOR, currentColor);  
+  glGetFloatv(GL_CURRENT_COLOR, currentColor);
+
+  glColor3f(0,0,0);
+  for(int i=-10; i<=10; i++){
+    glBegin(GL_LINES);
+      glVertex3f(-10, 0, i);
+      glVertex3f(10, 0, i);
+    glEnd();
+  }
+
+  for(int i=-10; i<=10; i++){
+    glBegin(GL_LINES);
+      glVertex3f(i, 0, -10);
+      glVertex3f(i, 0, 10);
+    glEnd();
+  }
   /** Desenha versores */
   glColor3f(1.0, 0.0, 0.0);
   glBegin(GL_LINES);
@@ -37,6 +55,7 @@ void drawAxes(float *basePoint, float *i, float *j, float *k)
     glVertex3f(basePoint[0], basePoint[1], basePoint[2]);
     glVertex3f(k[0], k[1], k[2]);
   glEnd();
+
   /** Retorna para cor anterior */
   glColor3f(currentColor[0], currentColor[1], currentColor[2]);
 }
@@ -70,28 +89,32 @@ void displayCallback()
   glClear(GL_COLOR_BUFFER_BIT);
 
   Point p = Point(0,0,1);
-  Point r = Point(1,1,0);
-  Point o = Point(0,0,0);
+  Point r = Point(1,0,0);
+  Point o = Point(0,0,2);
 
   glColor3f(0.0f, 0.0f, 0.0f);
   /** Desenha a janela mais a esquerda */
   glViewport(0, 0, width/2, height);
   glLoadIdentity();
-  gluLookAt(3.0, 2.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
   drawWCAxes();
   glBegin(GL_POINTS);
     glVertex3f(p.getX(), p.getY(), p.getZ());
   glEnd();
+  GLUquadric *cylinder = gluNewQuadric();
+  gluQuadricDrawStyle(cylinder, GLU_LINE);
+  gluCylinder(cylinder,  1,  1,  3,  30,  1);
 
   /** Desenha a janela mais a direita */
   glViewport(width/2, 0, width/2, height);
   glLoadIdentity();
-  gluLookAt(3.0, 2.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
   drawWCAxes();
   p.rotate(o, 90, r);
   glBegin(GL_POINTS);
     glVertex3f(p.getX(), p.getY(), p.getZ());
   glEnd();
+  glutWireSphere(2, 30, 30);
 
   /** Dispara os comandos APENAS uma vez */
   glFlush();
@@ -114,6 +137,42 @@ void reshapeCallback(int w, int h)
   glMatrixMode(GL_MODELVIEW);
 }
 
+void keybord_keypress(GLubyte key, GLint x, GLint y){
+    GLint m = glutGetModifiers();
+
+    //FECHA A JANELA AO APERTAR CTRL+D
+    if(m == GLUT_ACTIVE_CTRL && (GLint) key == 4)
+        exit(EXIT_SUCCESS);
+
+    
+    if (key == '6'){
+        eye.rotate(target, 5, Point(0,1,0));
+        glutPostRedisplay();
+    }
+    if (key == '4'){
+        eye.rotate(target, -5, Point(0,1,0));
+        glutPostRedisplay();
+    }
+    if (key == '8'){
+        eye.setY(eye.getY() + 0.1);
+        glutPostRedisplay();
+    }
+    if (key == '2'){
+        eye.setY(eye.getY() - 0.1);
+        glutPostRedisplay();
+    }
+
+
+    if (key == 'w' || key == 'W'){
+        target.setY(target.getY() + 0.1);
+        glutPostRedisplay();
+    }
+    if (key == 's' || key == 'S'){
+        target.setY(target.getY() - 0.1);
+        glutPostRedisplay();
+    }
+}
+
 int main(int argc, char **argv)
 {
   /** Passo 1: Inicializa fun��es GLUT */
@@ -127,6 +186,8 @@ int main(int argc, char **argv)
   /** Passo 2: Registra callbacks da OpenGl */
   glutDisplayFunc(displayCallback);
   glutReshapeFunc(reshapeCallback);
+
+  glutKeyboardFunc(keybord_keypress);
 
   /** Passo 3: Executa o programa */
   glutMainLoop();

@@ -98,6 +98,8 @@ void Point::rotate(Point O, GLfloat deg, Point dir){
     print();
 
     this->translate(O.getX(),O.getY(), O.getZ());
+
+    print();
 }
 
 void Point::setX(GLfloat x){
