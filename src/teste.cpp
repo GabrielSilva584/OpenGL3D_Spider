@@ -6,7 +6,7 @@
 #include <GL/glut.h>
 #include "point.h"
 
-int width = 500;
+int width = 1000;
 int height = 500;
 
 Point eye = Point(3.0, 5.0, 5.0);
@@ -94,8 +94,8 @@ void displayCallback()
 
   glColor3f(0.0f, 0.0f, 0.0f);
   /** Desenha a janela mais a esquerda */
-  glViewport(0, 0, width/2, height);
-  glLoadIdentity();
+  glViewport(0, 0, width, height);
+  /*glLoadIdentity();
   gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
   drawWCAxes();
   glBegin(GL_POINTS);
@@ -104,9 +104,9 @@ void displayCallback()
   GLUquadric *cylinder = gluNewQuadric();
   gluQuadricDrawStyle(cylinder, GLU_LINE);
   gluCylinder(cylinder,  1,  1,  3,  30,  1);
-
+*/
   /** Desenha a janela mais a direita */
-  glViewport(width/2, 0, width/2, height);
+  //glViewport(width/2, 0, width/2, height);
   glLoadIdentity();
   gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
   drawWCAxes();
@@ -114,7 +114,17 @@ void displayCallback()
   glBegin(GL_POINTS);
     glVertex3f(p.getX(), p.getY(), p.getZ());
   glEnd();
-  glutWireSphere(2, 30, 30);
+  glutWireSphere(0.1, 30, 30);
+  GLUquadric *cylinder = gluNewQuadric();
+  gluQuadricDrawStyle(cylinder, GLU_LINE);
+  gluCylinder(cylinder,  0.1,  0.1,  3,  30,  1);
+  glTranslatef(0,0,3);
+  glutWireSphere(0.1, 30, 30);
+  glRotatef(45,1,0,0);
+  gluCylinder(cylinder,  0.1,  0.1,  3,  30,  1);
+  glTranslatef(0,0,3);
+  glutWireSphere(0.1, 30, 30);
+
 
   /** Dispara os comandos APENAS uma vez */
   glFlush();
@@ -133,7 +143,7 @@ void reshapeCallback(int w, int h)
   /** Define o volume de vista */
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(65.0, (GLfloat) width/(GLfloat) height, 1.0, 20.0);
+  gluPerspective(65.0, (GLfloat) width/(GLfloat) height, 0.0001, 50.0);
   glMatrixMode(GL_MODELVIEW);
 }
 
@@ -144,24 +154,6 @@ void keybord_keypress(GLubyte key, GLint x, GLint y){
     if(m == GLUT_ACTIVE_CTRL && (GLint) key == 4)
         exit(EXIT_SUCCESS);
 
-    
-    if (key == '6'){
-        eye.rotate(target, 5, Point(0,1,0));
-        glutPostRedisplay();
-    }
-    if (key == '4'){
-        eye.rotate(target, -5, Point(0,1,0));
-        glutPostRedisplay();
-    }
-    if (key == '8'){
-        eye.setY(eye.getY() + 0.1);
-        glutPostRedisplay();
-    }
-    if (key == '2'){
-        eye.setY(eye.getY() - 0.1);
-        glutPostRedisplay();
-    }
-
 
     if (key == 'w' || key == 'W'){
         target.setY(target.getY() + 0.1);
@@ -171,7 +163,52 @@ void keybord_keypress(GLubyte key, GLint x, GLint y){
         target.setY(target.getY() - 0.1);
         glutPostRedisplay();
     }
+    if (key == 'a' || key == 'A'){
+        target.rotate(eye, 2.5, Point(0,1,0));
+        glutPostRedisplay();
+    }
+    if (key == 'd' || key == 'D'){
+        target.rotate(eye, -2.5, Point(0,1,0));
+        glutPostRedisplay();
+    }
+
+    //Reset target
+    if (key == ' '){
+        target = Point(0,0,0);
+        glutPostRedisplay();
+    }
+
+    //ESC = 27
+    if (key == 27){
+        glutReshapeWindow(width, height);
+    }
 }
+
+void keybord_special_keypress(GLint key, GLint x, GLint y){
+    if(key == GLUT_KEY_F11){
+        glutFullScreen();
+    }
+
+    if (key == GLUT_KEY_RIGHT){
+        eye.rotate(target, 5, Point(0,1,0));
+        glutPostRedisplay();
+    }
+    if (key == GLUT_KEY_LEFT){
+        eye.rotate(target, -5, Point(0,1,0));
+        glutPostRedisplay();
+    }
+    if (key == GLUT_KEY_UP){
+        eye.setY(eye.getY() + 0.1);
+        target.setY(target.getY() + 0.1);
+        glutPostRedisplay();
+    }
+    if (key == GLUT_KEY_DOWN){
+        eye.setY(eye.getY() - 0.1);
+        target.setY(target.getY() - 0.1);
+        glutPostRedisplay();
+    }
+}
+
 
 int main(int argc, char **argv)
 {
@@ -188,6 +225,7 @@ int main(int argc, char **argv)
   glutReshapeFunc(reshapeCallback);
 
   glutKeyboardFunc(keybord_keypress);
+  glutSpecialFunc(keybord_special_keypress);
 
   /** Passo 3: Executa o programa */
   glutMainLoop();
