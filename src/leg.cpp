@@ -4,13 +4,11 @@
 
 Leg::Leg(){}
 
-Leg::Leg(Point a, GLfloat angleA, GLfloat angleB, GLfloat sizeA,
-	GLfloat sizeB, GLboolean leftLeg, GLboolean invertAnim) :
-		a(a), angleA0(angleA), angleB0(angleB),sizeA(sizeA), sizeB(sizeB),
-		leftLeg(leftLeg), invertAnim(invertAnim)
+Leg::Leg(Point a, GLfloat angleA, GLfloat angleAx, GLfloat angleB, GLfloat angleBx,
+	GLfloat sizeA, GLfloat sizeB, GLboolean leftLeg, GLboolean invertAnim) :
+		a(a), angleA0(angleA), angleAx0(angleAx), angleB0(angleB), angleBx0(angleBx), 
+		sizeA(sizeA), sizeB(sizeB), leftLeg(leftLeg), invertAnim(invertAnim)
 {	
-
-	
 	if(leftLeg == true){
 		this->angleA0 = 180 - angleA;
 		this->angleB0 = - angleB;
@@ -18,14 +16,10 @@ Leg::Leg(Point a, GLfloat angleA, GLfloat angleB, GLfloat sizeA,
 
 	this->angleA = angleA0;
 	this->angleB = angleB0;
-
-	b = c = a;
-	b.setX(b.getX() + sizeA);
-	c.setX(c.getX() + sizeA + sizeB);
+	this->angleAx = angleAx0;
+	this->angleBx = angleBx0;
 
 	animationTime = 0;
-	initialSizeArmOne = b.getX();
-	initialSizeArmTwo = c.getX();
 }
 
 void Leg::update(GLfloat delta_ms){
@@ -37,17 +31,11 @@ void Leg::update(GLfloat delta_ms){
 			angleA = angleA0 + 15*cos(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6);
 			//Variação no angulo B
 			angleB = angleB0 + 15*sin(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6);
-			//Variação no tamanho da coxa
-			b.setX(initialSizeArmOne + (this->sizeA/10)*cos(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6));
-			//Variação no tamanho da perna
-			c.setX(initialSizeArmTwo + (this->sizeB/7)*sin(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6));
 		}
 		//Definição pernas E1 e E3
 		else{
 			angleA = angleA0 - 15*cos(2*PI*animationTime/ANIMATION_LOOP_TIME);
 			angleB = angleB0 - 15*sin(2*PI*animationTime/ANIMATION_LOOP_TIME);
-			b.setX(initialSizeArmOne - (this->sizeA/10)*cos(2*PI*animationTime/ANIMATION_LOOP_TIME));
-			c.setX(initialSizeArmTwo - (this->sizeB/7)*sin(2*PI*animationTime/ANIMATION_LOOP_TIME));
 		}
 	}
 	else{
@@ -55,47 +43,41 @@ void Leg::update(GLfloat delta_ms){
 		if(this->invertAnim){
 			angleA = angleA0 - 15*cos(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6);
 			angleB = angleB0 - 15*sin(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6);
-			b.setX(initialSizeArmOne + (this->sizeA/10)*cos(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6));
-			c.setX(initialSizeArmTwo + (this->sizeB/7)*sin(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6));
 		}
 		//Definição pernas D2 e D4
 		else{
 			angleA = angleA0 + 15*cos(2*PI*animationTime/ANIMATION_LOOP_TIME);
 			angleB = angleB0 + 15*sin(2*PI*animationTime/ANIMATION_LOOP_TIME);
-			b.setX(initialSizeArmOne - (this->sizeA/10)*cos(2*PI*animationTime/ANIMATION_LOOP_TIME));
-			c.setX(initialSizeArmTwo - (this->sizeB/7)*sin(2*PI*animationTime/ANIMATION_LOOP_TIME));
 		}
 	}
-
-
 	animationTime+=delta_ms;
-
 }
 
 void Leg::draw(){
 	glPushMatrix();
 
-	//Prepara para desenhar a primeira divisão da perna
-	glTranslated(a.getX(), a.getY(), 0);
-	glRotated(angleA, 0.0, 0.0, -1.0);
-	glTranslated(-a.getX(), -a.getY(), 0);
+	GLUquadric *cylinder = gluNewQuadric();
+	gluQuadricDrawStyle(cylinder, GLU_LINE);
 
-	//Desenha a primeira divisão da perna
-	glBegin(GL_LINES);
-		glVertex2i(a.getX(), a.getY());
-		glVertex2i(b.getX(), b.getY());
-	glEnd();
+	glTranslated(a.getX(), a.getY(), a.getZ());
+	glRotatef(angleAx, 1.0, 0.0, 0.0);
+	glRotatef(angleA, 0.0, 1.0, 0.0);
 
-	//Prepara para desenhar a segunda divisão da perna
-	glTranslated(b.getX(), b.getY(), 0);
-	glRotated(angleB, 0.0, 0.0, -1.0);
-	glTranslated(-b.getX(), -b.getY(), 0);
+	glutWireSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);	
+	gluCylinder(cylinder,  LEG_RADIUS,  LEG_RADIUS,  sizeA,  DETAIL_RATE,  1);
 
-	//Desenha a segunda divisão da perna
-	glBegin(GL_LINES);
-		glVertex2i(b.getX(), b.getY());
-		glVertex2i(c.getX(), c.getY());
-	glEnd();
+	glTranslatef(0,0,sizeA);
+
+	glutWireSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);
+
+	glRotatef(angleBx, 1.0, 0.0, 0.0);
+	glRotatef(angleB, 0.0, 1.0, 0.0);
+
+	gluCylinder(cylinder,  LEG_RADIUS,  LEG_RADIUS,  sizeB,  DETAIL_RATE,  1);
+
+	glTranslatef(0,0,sizeB);
+
+	glutWireSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);
 
 	glPopMatrix();
 }

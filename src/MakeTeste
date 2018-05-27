@@ -1,5 +1,5 @@
 all:
-	g++ -o Teste teste.cpp point.cpp -lm -lGL -lglut -lGLU
+	g++ -o Teste teste.cpp point.cpp leg.cpp -lm -lGL -lglut -lGLU
 
 clean:
 	rm Teste
