@@ -10,10 +10,15 @@
 int width = 1000;
 int height = 500;
 
+int gridSize = 50;
+int gridSpacing = 1;
+
+GLfloat FRAME_MS = 1000/60;
+
 Point eye = Point(3.0, 5.0, 5.0);
 Point target = Point(0.0, 0.0, 0.0);
 
-Spider *test;
+Spider *spider;
 
 /**
  * @desc Desenha eixos de um sistema de coordenadas.
@@ -28,20 +33,24 @@ void drawAxes(float *basePoint, float *i, float *j, float *k)
 	/** Armazena cor atual */
 	glGetFloatv(GL_CURRENT_COLOR, currentColor);
 
+	//Desenho da GRID no plano XZ
+	//Desenha as linhas paralelas ao eixo Z
 	glColor3f(0,0,0);
-	for(int i=-10; i<=10; i++){
+	for(int i=-gridSize; i<=gridSize; i+=gridSpacing){
 		glBegin(GL_LINES);
-		glVertex3f(-10, 0, i);
-		glVertex3f(10, 0, i);
+		glVertex3f(-gridSize, 0, i);
+		glVertex3f(gridSize, 0, i);
+		glEnd();
+	}
+	//Desenha as linhas paralelas ao eixo X
+	for(int i=-gridSize; i<=gridSize; i+=gridSpacing){
+		glBegin(GL_LINES);
+		glVertex3f(i, 0, -gridSize);
+		glVertex3f(i, 0, gridSize);
 		glEnd();
 	}
 
-	for(int i=-10; i<=10; i++){
-		glBegin(GL_LINES);
-		glVertex3f(i, 0, -10);
-		glVertex3f(i, 0, 10);
-		glEnd();
-	}
+
 	/** Desenha versores */
 	glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_LINES);
@@ -127,7 +136,7 @@ void displayCallback()
 	gluCylinder(cylinder,  0.1,  0.1,  3,  30,  1);
 	glTranslatef(0,0,3);
 	glutWireSphere(0.1, 30, 30);*/
-	test->draw();
+	spider->draw();
 
 	/** Dispara os comandos APENAS uma vez */
 	glFlush();
@@ -157,28 +166,26 @@ void keybord_keypress(GLubyte key, GLint x, GLint y){
 	if(m == GLUT_ACTIVE_CTRL && (GLint) key == 4)
 		exit(EXIT_SUCCESS);
 
+	if (key == 't' || key == 'T'){
+		spider->toggleAnimation();
+	}
 
 	if (key == 'w' || key == 'W'){
 		target.setY(target.getY() + 0.1);
-		glutPostRedisplay();
 	}
 	if (key == 's' || key == 'S'){
 		target.setY(target.getY() - 0.1);
-		glutPostRedisplay();
 	}
 	if (key == 'a' || key == 'A'){
 		target.rotate(eye, 2.5, Point(0,1,0));
-		glutPostRedisplay();
 	}
 	if (key == 'd' || key == 'D'){
 		target.rotate(eye, -2.5, Point(0,1,0));
-		glutPostRedisplay();
 	}
 
 	//Reset target
 	if (key == ' '){
 		target = Point(0,0,0);
-		glutPostRedisplay();
 	}
 
 	//ESC = 27
@@ -194,22 +201,26 @@ void keybord_special_keypress(GLint key, GLint x, GLint y){
 
 	if (key == GLUT_KEY_RIGHT){
 		eye.rotate(target, 5, Point(0,1,0));
-		glutPostRedisplay();
 	}
 	if (key == GLUT_KEY_LEFT){
 		eye.rotate(target, -5, Point(0,1,0));
-		glutPostRedisplay();
 	}
 	if (key == GLUT_KEY_UP){
 		eye.setY(eye.getY() + 0.1);
 		target.setY(target.getY() + 0.1);
-		glutPostRedisplay();
 	}
 	if (key == GLUT_KEY_DOWN){
 		eye.setY(eye.getY() - 0.1);
 		target.setY(target.getY() - 0.1);
-		glutPostRedisplay();
 	}
+}
+
+void update(GLint param){
+    //update spider here (move/animate)
+    spider->update(FRAME_MS);
+
+    glutTimerFunc(FRAME_MS, update, 0);
+    glutPostRedisplay();
 }
 
 
@@ -220,10 +231,10 @@ int main(int argc, char **argv)
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(width, height);
-	glutCreateWindow("Duas viewports");
+	glutCreateWindow("Aranha 3D");
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-	test = new Spider(Point(0,1,0));
+	spider = new Spider(Point(0,1,0));
 
 	/** Passo 2: Registra callbacks da OpenGl */
 	glutDisplayFunc(displayCallback);
@@ -231,6 +242,8 @@ int main(int argc, char **argv)
 
 	glutKeyboardFunc(keybord_keypress);
 	glutSpecialFunc(keybord_special_keypress);
+
+	glutTimerFunc(FRAME_MS, update, 0);
 
 	/** Passo 3: Executa o programa */
 	glutMainLoop();

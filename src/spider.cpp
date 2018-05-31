@@ -85,20 +85,29 @@ void Spider::update(GLfloat delta_temp){
             else
                 translate(MOVEMENT_SPEED*direction.getX(), MOVEMENT_SPEED*direction.getY());
         }
-            
+    }*/      
         //atualizar pernas
-        if(isAnimated){
-        ext_leg_r.update(delta_temp);
-        int_leg_l1.update(delta_temp);
-        int_leg_r2.update(delta_temp);
-        int_leg_l3.update(delta_temp);
-        ext_leg_l.update(delta_temp);
-        int_leg_r1.update(delta_temp);
-        int_leg_l2.update(delta_temp);
-        int_leg_r3.update(delta_temp);
+    if(isAnimated){
+        leg_l1.update(delta_temp);
+        leg_l2.update(delta_temp);
+        leg_l3.update(delta_temp);
+        leg_l4.update(delta_temp);
+        leg_r1.update(delta_temp);
+        leg_r2.update(delta_temp);
+        leg_r3.update(delta_temp);
+        leg_r4.update(delta_temp);
         animationTime += delta_temp;
-	    }
-    }*/
+    } else {
+        leg_l1.rest();
+        leg_l2.rest();
+        leg_l3.rest();
+        leg_l4.rest();
+        leg_r1.rest();
+        leg_r2.rest();
+        leg_r3.rest();
+        leg_r4.rest();
+    }
+    
 
 }
 
@@ -127,4 +136,11 @@ void Spider::draw(){
     glTranslatef(BODY_INTERSECTION*(BODY_SIZE1+BODY_SIZE2), 0.0, 0.0);
 
     glPopMatrix();
+}
+
+void Spider::toggleAnimation(){
+    if(isAnimated) 
+        isAnimated = false;
+    else
+        isAnimated = true;
 }

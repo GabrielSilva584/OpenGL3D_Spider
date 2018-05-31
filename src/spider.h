@@ -40,6 +40,7 @@ class Spider : public DrawableObject{
         void walkTo(Point destiny);
         void update(GLfloat delta_temp);
         void draw();
+        void toggleAnimation();
 };
 
 #endif

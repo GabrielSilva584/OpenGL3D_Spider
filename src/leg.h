@@ -21,7 +21,9 @@ class Leg{
             GLfloat angleBx, GLfloat sizeA, GLfloat sizeB, 
             GLboolean leftLeg, GLboolean invertAnim);
         void update(GLfloat delta_ms);
+        void rest();
         void draw();
+        GLfloat halfBridgeRectifier(GLfloat number, GLfloat inferiorLimit);
 };
 
 #endif
