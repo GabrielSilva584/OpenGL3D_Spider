@@ -1,8 +1,0 @@
-all:
-	g++ -o Teste teste.cpp point.cpp drawable_object.cpp leg.cpp spider.cpp -lm -lGL -lglut -lGLU
-
-clean:
-	rm Teste
-
-run:
-	./Teste
