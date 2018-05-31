@@ -13,7 +13,7 @@ int height = 500;
 int gridSize = 50;
 int gridSpacing = 1;
 
-GLfloat FRAME_MS = 1000/60;
+GLfloat FRAME_MS = 1000/30;
 
 Point eye = Point(3.0, 5.0, 5.0);
 Point target = Point(0.0, 0.0, 0.0);

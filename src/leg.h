@@ -11,9 +11,10 @@
 class Leg{
     private:
         Point a;
-        GLfloat angleA, angleA0, angleAx, angleAx0, 
-                angleBx, angleBx0, sizeA, sizeB, animationTime;
-        GLboolean leftLeg, invertAnim;
+        GLfloat angleA, angleA0, angleAx, angleAx0, angleBx,
+                angleBx0, sizeA, sizeB, animationTime,
+                rangeAngleA, rangeAngleAx, rangeAngleBx;
+        GLboolean leftLeg, invertAnim, normalAnimation;
 
     public:
         Leg();

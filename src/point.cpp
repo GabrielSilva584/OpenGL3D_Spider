@@ -43,8 +43,6 @@ void Point::rotate(Point O, GLfloat deg, Point dir){
         if(Yref < 0) angle2 = -angle2;
     }else angle2 = 0;
 
-    printf("%f %f\n", 180*angle1/PI, 180*angle2/PI);
-
     if(angle1 != 0){
         //rotacao em Y para zerar Xref
         Z = Zold*cos(angle1) + Xold*sin(angle1);
@@ -53,8 +51,6 @@ void Point::rotate(Point O, GLfloat deg, Point dir){
         Zold = Z;
         Xold = X;
     }
-
-    print();
 
     if(angle2 != 0){
         //rotacao em X para zerar Yref
@@ -65,16 +61,12 @@ void Point::rotate(Point O, GLfloat deg, Point dir){
         Zold = Z;
     }
 
-    print();
-
     //rotacao requisitada
     X = Xold*cos(PI*deg/180) - Yold*sin(PI*deg/180);
     Y = Xold*sin(PI*deg/180) + Yold*cos(PI*deg/180);
 
     Xold = X;
     Yold = Y;
-
-    print();
 
     if(angle2 != 0){
         //desfaz rotacao em X
@@ -85,7 +77,6 @@ void Point::rotate(Point O, GLfloat deg, Point dir){
         Zold = Z;
     }
 
-    print();
     if(angle1 != 0){
         //desfaz rotacao em Y
         Z = Zold*cos(-angle1) + Xold*sin(-angle1);
@@ -95,11 +86,9 @@ void Point::rotate(Point O, GLfloat deg, Point dir){
     if(abs(X) < 0.00001) X = 0;
     if(abs(Y) < 0.00001) Y = 0;
     if(abs(Z) < 0.00001) Z = 0;
-    print();
-
+   
     this->translate(O.getX(),O.getY(), O.getZ());
 
-    print();
 }
 
 void Point::setX(GLfloat x){

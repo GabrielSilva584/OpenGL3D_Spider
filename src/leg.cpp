@@ -1,6 +1,7 @@
 #include "leg.h"
 #include<cmath>
 #include<math.h>
+#include<iostream>
 
 Leg::Leg(){}
 
@@ -17,42 +18,91 @@ Leg::Leg(Point a, GLfloat angleA, GLfloat angleAx, GLfloat angleBx,
 	this->angleAx = angleAx0;
 	this->angleBx = angleBx0;
 
+	rangeAngleA = 10;
+	rangeAngleAx = 5;
+	rangeAngleBx = 30;
+
 	animationTime = 0;
+	normalAnimation = false;
 }
 
 void Leg::update(GLfloat delta_ms){
 
+	GLfloat initSpeed = 2;
+
 	if(this->leftLeg){
-		//Definição pernas E2 e E4, PI/6 adicionado nos senos e cossenos puramente para quebrar simetria
+		//Definição pernas E2 e E4, PI/6 adicionado nos cossenos puramente para quebrar simetria
 		if(this->invertAnim){
-			//Variação no angulo A
-			angleA = angleA0 + 10*cos(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6);
-			angleAx = angleAx0 + halfBridgeRectifier(10*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0.0);
+			if(this->normalAnimation){
+				angleA = angleA0 + rangeAngleA*cos(2*PI*animationTime/ANIMATION_LOOP_TIME);
+				angleAx = angleAx0 + halfBridgeRectifier(rangeAngleAx*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0);
+				angleBx = angleBx0 + halfBridgeRectifier(rangeAngleBx*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0);
+			}else{ //Animação realizada para transição suave entre estado parado e estado de movimento
+				if(angleA == (angleA0 + rangeAngleA))
+					this->normalAnimation = true;
+				else if((angleA0 + rangeAngleA - angleA) >= initSpeed)
+					angleA += initSpeed;
+				else
+					angleA = angleA0 + rangeAngleA;
+			}
 		}
 		//Definição pernas E1 e E3
 		else{
-			angleA = angleA0 - 10*cos(2*PI*animationTime/ANIMATION_LOOP_TIME);
-			angleAx = angleAx0 + halfBridgeRectifier(-10*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0.0);
+			if(this->normalAnimation){
+				angleA = angleA0 - rangeAngleA*cos(2*PI*animationTime/ANIMATION_LOOP_TIME);
+				angleAx = angleAx0 + halfBridgeRectifier(-rangeAngleAx*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0.0);
+				angleBx = angleBx0 + halfBridgeRectifier(-rangeAngleBx*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0);
+			}else{ //Animação realizada para transição suave entre estado parado e estado de movimento
+				if(angleA == (angleA0 - rangeAngleA))
+					this->normalAnimation = true;
+				else if((angleA0 - rangeAngleA - angleA) <= initSpeed)
+					angleA -= initSpeed;
+				else
+					angleA = angleA0 - rangeAngleA;
+			}
 		}
 	}
 	else{
-		//Definição pernas D1 e D3, PI/6 adicionado nos senos e cossenos puramente para quebrar simetria
+		//Definição pernas D1 e D3, PI/6 adicionado nos cossenos puramente para quebrar simetria
 		if(this->invertAnim){
-			angleA = angleA0 - 10*cos(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6);
-			angleAx = angleAx0 - halfBridgeRectifier(10*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0.0);
+			if(this->normalAnimation){
+				angleA = angleA0 - rangeAngleA*cos(2*PI*animationTime/ANIMATION_LOOP_TIME+PI/6);
+				angleAx = angleAx0 - halfBridgeRectifier(rangeAngleAx*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0.0);
+				angleBx = angleBx0 - halfBridgeRectifier(rangeAngleBx*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0);
+			}else{ //Animação realizada para transição suave entre estado parado e estado de movimento
+				if(angleA == (angleA0 - rangeAngleA))
+					this->normalAnimation = true;
+				else if((angleA0 - rangeAngleA - angleA) <= initSpeed)
+					angleA -= initSpeed;
+				else
+					angleA = angleA0 - rangeAngleA;
+			}
 		}
 		//Definição pernas D2 e D4
 		else{
-			angleA = angleA0 + 10*cos(2*PI*animationTime/ANIMATION_LOOP_TIME);
-			angleAx = angleAx0 - halfBridgeRectifier(-10*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0.0);
+			if(this->normalAnimation){
+				angleA = angleA0 + rangeAngleA*cos(2*PI*animationTime/ANIMATION_LOOP_TIME);
+				angleAx = angleAx0 - halfBridgeRectifier(-rangeAngleAx*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0.0);
+				angleBx = angleBx0 - halfBridgeRectifier(-rangeAngleBx*sin(2*PI*animationTime/ANIMATION_LOOP_TIME), 0);
+			}else{ //Animação realizada para transição suave entre estado parado e estado de movimento
+				if(angleA == (angleA0 + rangeAngleA))
+					this->normalAnimation = true;
+				else if((angleA0 + rangeAngleA - angleA) >= initSpeed)
+					angleA += initSpeed;
+				else
+					angleA = angleA0 + rangeAngleA;
+			}
 		}
 	}
-	animationTime+=delta_ms;
+
+	if(normalAnimation)
+		animationTime+=delta_ms;
 }
 void Leg::rest(){
 	animationTime = 0;
+	normalAnimation = false;
 
-	int restSpeed = 1;
+	int restSpeed = 2;
 
 	GLfloat deltaAngleA = angleA - angleA0;
 	GLfloat deltaAngleAx = angleAx - angleAx0;
