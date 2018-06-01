@@ -56,6 +56,7 @@ const GLchar *HUDHelp = "H = Exibir Comandos",
 		*HUDLookAra = "Espaco = Olhar para Aranha",
 		*HUDRendMode = "R = Modo de Renderizacao",
 		*HUDCamMode = "M = Modo de Camera Livre",
+		*HUDAAMode = "T = MultiSample Anti-Aliasing",
 		*HUDFS = "F11 = Modo FullScreen",
 		*HUDExitFS = "ESC = Sair do Modo FullScreen",
 		*HUDClose = "Ctrl+D = Fechar";
@@ -63,6 +64,9 @@ const GLfloat HUDx = 10, HUDy = 30;
 
 //Estado da HUD
 GLboolean exibirHUD = false;
+
+//Estado do Anti-Aliasing
+GLboolean msaa = true;
 
 //A aranha
 Spider *spider;
@@ -133,6 +137,15 @@ void keyPress(GLubyte key, GLint x, GLint y){
 		//Altera modo da HUD
 		case 'h': case 'H':
 			exibirHUD = !exibirHUD;
+			break;
+
+		//Altera modo do Anti-Aliasing
+		case 't': case 'T':
+			msaa = !msaa;
+			if (msaa) 
+				glEnable(GL_MULTISAMPLE_ARB);
+			else 
+				glDisable(GL_MULTISAMPLE_ARB);
 			break;
 
 		//Olha para a aranha
@@ -350,14 +363,15 @@ void draw(){
 	if(exibirHUD){
 		renderText(HUDx, 2*HUDy, HUDCamMode);
 		renderText(HUDx, 3*HUDy, HUDRendMode);
-		renderText(HUDx, 4*HUDy, HUDFS);
-		renderText(HUDx, 5*HUDy, HUDExitFS);
-		renderText(HUDx, 6*HUDy, HUDClose);
+		renderText(HUDx, 4*HUDy, HUDAAMode);
+		renderText(HUDx, 5*HUDy, HUDFS);
+		renderText(HUDx, 6*HUDy, HUDExitFS);
+		renderText(HUDx, 7*HUDy, HUDClose);
 		if(freeCameraMode){
-			renderText(HUDx, 8*HUDy, HUDMovAra);
-			renderText(HUDx, 9*HUDy, HUDMovCam);
-			renderText(HUDx, 10*HUDy, HUDRotCam);
-			renderText(HUDx, 11*HUDy, HUDLookAra);
+			renderText(HUDx, 9*HUDy, HUDMovAra);
+			renderText(HUDx, 10*HUDy, HUDMovCam);
+			renderText(HUDx, 11*HUDy, HUDRotCam);
+			renderText(HUDx, 12*HUDy, HUDLookAra);
 		}
 	}
 
@@ -483,13 +497,14 @@ void update(GLint param){
 int main(int argc, char **argv){
 	//Inicializar funções GLUT
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowSize(width, height);
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow("Aranha 3D");
 
 	//Configurar OpenGL
 	glDepthMask(GL_TRUE);
+	glEnable(GL_MULTISAMPLE_ARB);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
