@@ -1,8 +1,19 @@
+//=======================================================================
+// Copyright (c) 2018 
+// Amador Marcelino de Souza Neto
+// Gabriel Martins da Silva
+// Matheus Araujo Jorge
+// 
+// Este código-fonte está sobre efeito da licensa GNU GPL v3.0 
+// (veja LICENSE para mais informações)
+//=======================================================================
+
 #include "leg.h"
 #include<cmath>
 #include<math.h>
 #include<iostream>
 
+//Construtores
 Leg::Leg(){}
 
 Leg::Leg(Point a, GLfloat angleA, GLfloat angleAx, GLfloat angleBx,
@@ -26,6 +37,7 @@ Leg::Leg(Point a, GLfloat angleA, GLfloat angleAx, GLfloat angleBx,
 	normalAnimation = false;
 }
 
+//Atualizar a animação
 void Leg::update(GLfloat delta_ms){
 
 	GLfloat initSpeed = 2;
@@ -98,6 +110,8 @@ void Leg::update(GLfloat delta_ms){
 	if(normalAnimation)
 		animationTime+=delta_ms;
 }
+
+//Parar suavemente a animação
 void Leg::rest(){
 	animationTime = 0;
 	normalAnimation = false;
@@ -136,6 +150,7 @@ void Leg::rest(){
 	}
 };
 
+//Desenhar a perna
 void Leg::draw(GLboolean wireframeMode){
 	glPushMatrix();
 
@@ -179,6 +194,7 @@ void Leg::draw(GLboolean wireframeMode){
 	glPopMatrix();
 }
 
+//Retorna o maior valor entre 'number' e 'inferiorLimit'
 GLfloat Leg::halfBridgeRectifier(GLfloat number, GLfloat inferiorLimit){
 	if(number>inferiorLimit)
 		return number;

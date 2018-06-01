@@ -1,3 +1,13 @@
+//=======================================================================
+// Copyright (c) 2018 
+// Amador Marcelino de Souza Neto
+// Gabriel Martins da Silva
+// Matheus Araujo Jorge
+// 
+// Este código-fonte está sobre efeito da licensa GNU GPL v3.0 
+// (veja LICENSE para mais informações)
+//=======================================================================
+
 #ifndef POINT
 #define POINT
 
@@ -17,7 +27,6 @@ class Point{
         void translate(GLfloat delX, GLfloat delY, GLfloat delZ);
         void rotate(Point O, GLfloat rad, Point dir);
 
-        void move(GLfloat x, GLfloat y, GLfloat z);
         GLfloat getX();
         GLfloat getY();
         GLfloat getZ();

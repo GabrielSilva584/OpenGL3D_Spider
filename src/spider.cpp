@@ -1,6 +1,17 @@
+//=======================================================================
+// Copyright (c) 2018 
+// Amador Marcelino de Souza Neto
+// Gabriel Martins da Silva
+// Matheus Araujo Jorge
+// 
+// Este código-fonte está sobre efeito da licensa GNU GPL v3.0 
+// (veja LICENSE para mais informações)
+//=======================================================================
+
 #include "spider.h"
 #include <stdio.h>
 
+//Construtores
 Spider::Spider(){}
 
 Spider::Spider(Point pos){
@@ -11,7 +22,8 @@ Spider::Spider(Point pos){
     this->pos = pos;
 
     tmp = Point(0, 0, BODY_SIZE1);
-
+    
+    //Definição das oito pernas
     tmp2 = tmp;
     tmp2.rotate(o, 180-LEG1_ANGLEA, Point(0.0, 1.0, 0.0));
     leg_l1 = Leg(tmp2, LEG1_ANGLEA, 180-LEG_ANGLEAX, -LEG_ANGLEBX, LEG_SIZEA1, LEG_SIZEB1, true, false);
@@ -44,6 +56,7 @@ Spider::Spider(Point pos){
     tmp2.rotate(o, LEG4_ANGLEA, Point(0.0, 1.0, 0.0));
     leg_r4 = Leg(tmp2, LEG4_ANGLEA, LEG_ANGLEAX, LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, false, false);
 
+    //Variáveis de controle
     animationTime = 0;
     speed = 0;
     isAnimated = false;
@@ -53,7 +66,9 @@ Spider::Spider(Point pos){
     directionLeftAnimation = 1;
 }
 
+//Atualizar animação e movimento da aranha
 void Spider::update(GLfloat delta_temp){
+    //Mover aranha
     if(speed!=0){
         Point p = Point(1.0, 0.0, 0.0);
         Point o = Point(0.0, 0.0, 0.0);
@@ -67,7 +82,7 @@ void Spider::update(GLfloat delta_temp){
         translate(movX, 0.0, movZ);
     }
 
-    //Animate legs
+    //Animar pernas
     if(isAnimated){
         //Invert Animation if walking backwards
         if(speed < 0) delta_temp *= -1;
@@ -92,7 +107,7 @@ void Spider::update(GLfloat delta_temp){
         leg_r4.rest();
     }
 
-    //Deaccelerate
+    //Desacelerar aranha
     if(speed > DEACCELERATION){
         speed -= DEACCELERATION;
     }else if(speed < -DEACCELERATION){
@@ -103,14 +118,17 @@ void Spider::update(GLfloat delta_temp){
     }
 }
 
+//Desenhar aranha
 void Spider::draw(){
     glPushMatrix();
 
+    //Posicionamento inicial
     glColor3f(0.0, 0.0, 0.0);
     glTranslatef(pos.getX() + tx, pos.getY() + ty, pos.getZ() + tz);
     glRotatef(rot_y, 0.0, 1.0, 0.0);
     glScalef(sx, sy, sz);
 
+    //Desenhar pernas
     leg_r1.draw(wireframeMode);
     leg_l1.draw(wireframeMode);
     leg_r2.draw(wireframeMode);
@@ -120,6 +138,7 @@ void Spider::draw(){
     leg_r4.draw(wireframeMode);
     leg_l4.draw(wireframeMode);
 
+    //Desenhar corpo
     if(wireframeMode){
         glutWireSphere(BODY_SIZE1, DETAIL_RATE, DETAIL_RATE);
     }else {
@@ -136,12 +155,14 @@ void Spider::draw(){
 
     glPopMatrix();
 
+    //Desenhar olhos
     drawEyes(EYE_SIZE1, EYE_ANGLEZ1, EYE_ANGLEY1);
     drawEyes(EYE_SIZE1, EYE_ANGLEZ2, EYE_ANGLEY2);
     drawEyes(EYE_SIZE2, EYE_ANGLEZ3, EYE_ANGLEY3);
     drawEyes(EYE_SIZE2, EYE_ANGLEZ4, EYE_ANGLEY4);
 }
 
+//Desenhar par de olhos
 void Spider::drawEyes(GLfloat size, GLfloat angleZ, GLfloat angleY){
     glPushMatrix();
 
@@ -175,22 +196,27 @@ void Spider::drawEyes(GLfloat size, GLfloat angleZ, GLfloat angleY){
     glPopMatrix();
 }
 
+//Retornar a coordenada X
 GLfloat Spider::getX(){
     return pos.getX() + tx;
 }
 
+//Retornar a coordenada Y
 GLfloat Spider::getY(){
     return pos.getY() + ty;
 }
 
+//Retornar a coordenada Z
 GLfloat Spider::getZ(){
     return pos.getZ() + tz;
 }
 
+//Alterar modo de renderização
 void Spider::toggleRenderMode(){
     wireframeMode = !wireframeMode;
 }
 
+//Virar para a esquerda
 void Spider::turnLeft(GLfloat delta_temp){
     rotate(TURN_SPEED*delta_temp);
     isAnimated = true;
@@ -200,6 +226,7 @@ void Spider::turnLeft(GLfloat delta_temp){
     }
 }
 
+//Virar para a direita
 void Spider::turnRight(GLfloat delta_temp){
     rotate(-TURN_SPEED*delta_temp);
     isAnimated = true;
@@ -209,6 +236,7 @@ void Spider::turnRight(GLfloat delta_temp){
     }
 }
 
+//Acelerar para frente
 void Spider::walkForward(GLfloat delta_temp){
     isAnimated = true;
     speed += ACCELERATION*delta_temp;
@@ -219,6 +247,7 @@ void Spider::walkForward(GLfloat delta_temp){
     }
 }
 
+//Acelerar para trás
 void Spider::walkBackward(GLfloat delta_temp){
     isAnimated = true;
     speed -= ACCELERATION*delta_temp;
@@ -229,6 +258,7 @@ void Spider::walkBackward(GLfloat delta_temp){
     }
 }
 
+//Alterar estado da animação
 void Spider::toggleAnimation(){
     isAnimated = !isAnimated;
 }

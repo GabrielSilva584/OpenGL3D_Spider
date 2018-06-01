@@ -1,3 +1,13 @@
+//=======================================================================
+// Copyright (c) 2018 
+// Amador Marcelino de Souza Neto
+// Gabriel Martins da Silva
+// Matheus Araujo Jorge
+// 
+// Este código-fonte está sobre efeito da licensa GNU GPL v3.0 
+// (veja LICENSE para mais informações)
+//=======================================================================
+
 #ifndef SPIDER
 #define SPIDER
 
@@ -44,9 +54,14 @@
 
 class Spider : public DrawableObject{
     private:
+        //Variáveis de Posicionamento
         Point pos, direction;
+
+        //Pernas
         Leg leg_r1, leg_r2, leg_r3, leg_r4,
             leg_l1, leg_l2, leg_l3, leg_l4;
+
+        //Variáveis de controle de Movimento e Animação
         GLfloat animationTime, speed;
         GLboolean isAnimated, wireframeMode;
         GLint directionRightAnimation, directionLeftAnimation;
@@ -63,7 +78,7 @@ class Spider : public DrawableObject{
         GLfloat getZ();
         void toggleRenderMode();
 
-        //Movement
+        //Movimento
         void turnLeft(GLfloat delta_temp);
         void turnRight(GLfloat delta_temp);
         void walkForward(GLfloat delta_temp);

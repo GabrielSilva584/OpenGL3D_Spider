@@ -1,4 +1,14 @@
 //=======================================================================
+// Copyright (c) 2018 
+// Amador Marcelino de Souza Neto
+// Gabriel Martins da Silva
+// Matheus Araujo Jorge
+// 
+// Este código-fonte está sobre efeito da licensa GNU GPL v3.0 
+// (veja LICENSE para mais informações)
+//=======================================================================
+
+//=======================================================================
 // Importações
 //=======================================================================
 
@@ -443,34 +453,34 @@ void update(GLint param){
 
 	//Movimento do Olho
 	if(eyeMoveForward){
-		eye.move(EYE_MOVEMENT_SPEED * f.getX(), 
+		eye.translate(EYE_MOVEMENT_SPEED * f.getX(), 
 				EYE_MOVEMENT_SPEED * f.getY(), 
 				EYE_MOVEMENT_SPEED * f.getZ());
-		target.move(EYE_MOVEMENT_SPEED * f.getX(), 
+		target.translate(EYE_MOVEMENT_SPEED * f.getX(), 
 				EYE_MOVEMENT_SPEED * f.getY(), 
 				EYE_MOVEMENT_SPEED * f.getZ());
 	}
 	if(eyeMoveBackward){
-		eye.move(-EYE_MOVEMENT_SPEED * f.getX(), 
+		eye.translate(-EYE_MOVEMENT_SPEED * f.getX(), 
 				-EYE_MOVEMENT_SPEED * f.getY(), 
 				-EYE_MOVEMENT_SPEED * f.getZ());
-		target.move(-EYE_MOVEMENT_SPEED * f.getX(), 
+		target.translate(-EYE_MOVEMENT_SPEED * f.getX(), 
 				-EYE_MOVEMENT_SPEED * f.getY(), 
 				-EYE_MOVEMENT_SPEED * f.getZ());
 	}
 	if(eyeMoveLeft){
-		eye.move(EYE_MOVEMENT_SPEED * p.getX(), 
+		eye.translate(EYE_MOVEMENT_SPEED * p.getX(), 
 				EYE_MOVEMENT_SPEED * p.getY(), 
 				EYE_MOVEMENT_SPEED * p.getZ());
-		target.move(EYE_MOVEMENT_SPEED * p.getX(), 
+		target.translate(EYE_MOVEMENT_SPEED * p.getX(), 
 				EYE_MOVEMENT_SPEED * p.getY(), 
 				EYE_MOVEMENT_SPEED * p.getZ());
 	}
 	if(eyeMoveRight){
-		eye.move(-EYE_MOVEMENT_SPEED * p.getX(), 
+		eye.translate(-EYE_MOVEMENT_SPEED * p.getX(), 
 				-EYE_MOVEMENT_SPEED * p.getY(), 
 				-EYE_MOVEMENT_SPEED * p.getZ());
-		target.move(-EYE_MOVEMENT_SPEED * p.getX(), 
+		target.translate(-EYE_MOVEMENT_SPEED * p.getX(), 
 				-EYE_MOVEMENT_SPEED * p.getY(), 
 				-EYE_MOVEMENT_SPEED * p.getZ());
 	}

@@ -1,3 +1,13 @@
+//=======================================================================
+// Copyright (c) 2018 
+// Amador Marcelino de Souza Neto
+// Gabriel Martins da Silva
+// Matheus Araujo Jorge
+// 
+// Este código-fonte está sobre efeito da licensa GNU GPL v3.0 
+// (veja LICENSE para mais informações)
+//=======================================================================
+
 #include <GL/glut.h>
 #include <cstdlib>
 #include <iostream>
@@ -5,17 +15,19 @@
 
 #include "point.h"
 
-
+//Construtores
 Point::Point() : X(0), Y(0), Z(0){}
 
 Point::Point(GLfloat x, GLfloat y, GLfloat z) : X(x), Y(y), Z(z){}
 
+//Translada o ponto no espaço
 void Point::translate(GLfloat delX, GLfloat delY, GLfloat delZ){
     X += delX;
     Y += delY;
     Z += delZ;
 }
 
+//Rotaciona o ponto 'deg' grau ao redor do ponto 'O' na direção 'dir'
 void Point::rotate(Point O, GLfloat deg, Point dir){
     this->translate(-O.getX(), -O.getY(), -O.getZ());
     GLfloat h1, h2, angle1, angle2;
@@ -91,24 +103,23 @@ void Point::rotate(Point O, GLfloat deg, Point dir){
 
 }
 
-void Point::move(GLfloat x, GLfloat y, GLfloat z){
-    X += x;
-    Y += y;
-    Z += z;
-}
-
+//Retornar a coordenada X
 GLfloat Point::getX(){
     return X;
 }
 
+//Retornar a coordenada Y
 GLfloat Point::getY(){
     return Y;
 }
 
+//Retornar a coordenada Z
 GLfloat Point::getZ(){
     return Z;
 }
 
+//Normaliza a distância do ponto à origem 
+//para ser utilizado como vetor
 void Point::normalize(){
     GLfloat s = sqrt( pow(X,2) + pow(Y,2) + pow(Z,2) );
     if(s == 0) return;
