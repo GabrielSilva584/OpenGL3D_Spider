@@ -26,7 +26,9 @@
 #define EYE_ANGLEZ4 40
 
 #define LEG_SIZEA 2
-#define LEG_SIZEB 5.6569/2
+#define LEG_SIZEB 2.82845
+#define LEG_SIZEA1 3
+#define LEG_SIZEB1 4.24267
 #define LEG1_ANGLEA 60
 #define LEG2_ANGLEA 30
 #define LEG3_ANGLEA 0

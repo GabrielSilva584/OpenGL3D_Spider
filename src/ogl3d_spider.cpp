@@ -366,7 +366,8 @@ void draw(){
 	glMatrixMode(GL_MODELVIEW);
 
 	//Troca de Buffer
-	glutSwapBuffers();
+	//glutSwapBuffers();
+	glFlush();
 }
 
 //Função de callback para reshape.
@@ -482,7 +483,7 @@ void update(GLint param){
 int main(int argc, char **argv){
 	//Inicializar funções GLUT
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_DEPTH | GLUT_RGB);
 	glutInitWindowSize(width, height);
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow("Aranha 3D");
