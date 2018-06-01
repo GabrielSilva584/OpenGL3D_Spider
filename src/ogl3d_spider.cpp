@@ -44,7 +44,7 @@ const GLfloat FRAME_MS = 1000/60;
 //Pontos da câmera
 Point eye = Point(3.0, 5.0, 5.0),
 	target = Point(0.0, 0.0, 0.0),
-	eyeY = Point(0.0, 15.0, 0.0),
+	eyeY = Point(-1.0, 15.0, 0.0),
 	eyeX = Point(15.0, 1.0, 0.0),
 	eyeZ = Point(0.0, 1.0, 15.0),
 	eyeXYZ = Point(10.0, 10.0, 10.0),
@@ -98,35 +98,39 @@ void keyPress(GLubyte key, GLint x, GLint y){
 	if(m == GLUT_ACTIVE_CTRL && (GLint) key == 4)
 		exit(EXIT_SUCCESS);
 
-	switch(key){
-		//Move a câmera com WASD
-		case 'w': case 'W':
-			eyeMoveForward = true;
-			break;
-		case 's': case 'S':
-			eyeMoveBackward = true;
-			break;
-		case 'a': case 'A':
-			eyeMoveLeft  = true;
-			break;
-		case 'd': case 'D':
-			eyeMoveRight  = true;
-			break;
-		
-		//Rotaciona a câmera com IJKL
-		case 'i': case 'I':
-			eyeTurnUp  = true;
-			break;
-		case 'k': case 'K':
-			eyeTurnDown  = true;
-			break;
-		case 'j': case 'J':
-			eyeTurnLeft  = true; 
-			break;
-		case 'l': case 'L':
-			eyeTurnRight  = true;
-			break;
+	if(freeCameraMode){
+		switch(key){
+			//Move a câmera com WASD
+			case 'w': case 'W':
+				eyeMoveForward = true;
+				break;
+			case 's': case 'S':
+				eyeMoveBackward = true;
+				break;
+			case 'a': case 'A':
+				eyeMoveLeft  = true;
+				break;
+			case 'd': case 'D':
+				eyeMoveRight  = true;
+				break;
+			
+			//Rotaciona a câmera com IJKL
+			case 'i': case 'I':
+				eyeTurnUp  = true;
+				break;
+			case 'k': case 'K':
+				eyeTurnDown  = true;
+				break;
+			case 'j': case 'J':
+				eyeTurnLeft  = true; 
+				break;
+			case 'l': case 'L':
+				eyeTurnRight  = true;
+				break;
+		}
+	}
 
+	switch(key){
 		//Altera modo de câmera
 		case 'm': case 'M':
 			freeCameraMode = !freeCameraMode;
@@ -165,6 +169,7 @@ void keyPress(GLubyte key, GLint x, GLint y){
 
 //Soltar teclas normais
 void keyRelease(GLubyte key, GLint x, GLint y){
+
 	switch(key){
 		//Move a câmera com WASD
 		case 'w': case 'W':
@@ -364,14 +369,14 @@ void draw(){
 	renderText(HUDx, HUDy, HUDHelp);
 
 	if(exibirHUD){
-		renderText(HUDx, 2*HUDy, HUDCamMode);
-		renderText(HUDx, 3*HUDy, HUDRendMode);
-		renderText(HUDx, 4*HUDy, HUDAAMode);
-		renderText(HUDx, 5*HUDy, HUDFS);
-		renderText(HUDx, 6*HUDy, HUDExitFS);
-		renderText(HUDx, 7*HUDy, HUDClose);
+		renderText(HUDx, 2*HUDy, HUDMovAra);
+		renderText(HUDx, 3*HUDy, HUDCamMode);
+		renderText(HUDx, 4*HUDy, HUDRendMode);
+		renderText(HUDx, 5*HUDy, HUDAAMode);
+		renderText(HUDx, 6*HUDy, HUDFS);
+		renderText(HUDx, 7*HUDy, HUDExitFS);
+		renderText(HUDx, 8*HUDy, HUDClose);
 		if(freeCameraMode){
-			renderText(HUDx, 9*HUDy, HUDMovAra);
 			renderText(HUDx, 10*HUDy, HUDMovCam);
 			renderText(HUDx, 11*HUDy, HUDRotCam);
 			renderText(HUDx, 12*HUDy, HUDLookAra);
