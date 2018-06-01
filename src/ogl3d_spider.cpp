@@ -21,7 +21,7 @@ const int gridSize = 50;
 const int gridSpacing = 1;
 
 //Modo de Câmera
-GLboolean freeCameraMode = true;
+GLboolean freeCameraMode = false;
 
 //Movimento da Aranha
 GLboolean spiderTurnRight, spiderTurnLeft, spiderWalkFoward, spiderWalkBackward;
@@ -31,15 +31,21 @@ GLboolean eyeTurnRight, eyeTurnLeft, eyeTurnUp, eyeTurnDown,
 		  eyeMoveForward, eyeMoveBackward, eyeMoveLeft, eyeMoveRight,
 		  lookAtSpider;
 
-const GLfloat EYE_TURN_SPEED  = 0.1, 
+const GLfloat EYE_TURN_SPEED  = 0.1,
 			EYE_MOVEMENT_SPEED = 0.2;
 
 //Intervalo entre frames
 const GLfloat FRAME_MS = 1000/60;
 
 //Pontos da câmera
-Point eye = Point(3.0, 5.0, 5.0);
-Point target = Point(0.0, 0.0, 0.0);
+Point eye = Point(3.0, 5.0, 5.0),
+	target = Point(0.0, 0.0, 0.0),
+	eyeY = Point(0.0, 15.0, 0.0),
+	eyeX = Point(15.0, 1.0, 0.0),
+	eyeZ = Point(0.0, 1.0, 15.0),
+	eyeXYZ = Point(10.0, 10.0, 10.0),
+	spiderPos = Point(0.0, 0.0, 0.0); 
+
 
 //Textos da HUD
 const GLchar *HUDHelp = "H = Exibir Comandos",
@@ -287,31 +293,33 @@ void draw(){
 	glColor3f(0.0f, 0.0f, 0.0f);
 	
 	if(!freeCameraMode){
+		spiderPos = Point(spider->getX(), spider->getY(), spider->getZ());
+
 		//Desenha a janela do canto inferior esquerdo
 		glViewport(0, 0, width/2, height/2);
 		glLoadIdentity();
-		gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
+		gluLookAt(eyeZ.getX(), eyeZ.getY(), eyeZ.getZ(), spiderPos.getX(), spiderPos.getY(), spiderPos.getZ(), 0.0, 1.0, 0.0);
 		drawGround();
 		spider->draw();
 
 		//Desenha a janela do canto inferior direito
 		glViewport(width/2, 0, width/2, height/2);
 		glLoadIdentity();
-		gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
+		gluLookAt(eyeXYZ.getX(), eyeXYZ.getY(), eyeXYZ.getZ(), spiderPos.getX(), spiderPos.getY(), spiderPos.getZ(), 0.0, 1.0, 0.0);
 		drawGround();
 		spider->draw();
 
 		//Desenha a janela do canto superior esquerdo
 		glViewport(0, height/2, width/2, height/2);
 		glLoadIdentity();
-		gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
+		gluLookAt(eyeX.getX(), eyeX.getY(), eyeX.getZ(), spiderPos.getX(), spiderPos.getY(), spiderPos.getZ(), 0.0, 1.0, 0.0);
 		drawGround();
 		spider->draw();
 
 		//Desenha a janela do canto superior direito
 		glViewport(width/2, height/2, width/2, height/2);
 		glLoadIdentity();
-		gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
+		gluLookAt(eyeY.getX(), eyeY.getY(), eyeY.getZ(), spiderPos.getX(), spiderPos.getY(), spiderPos.getZ(), 0.0, 1.0, 0.0);
 		drawGround();
 		spider->draw();
 	}else {
@@ -339,15 +347,17 @@ void draw(){
 	renderText(HUDx, HUDy, HUDHelp);
 
 	if(exibirHUD){
-		renderText(HUDx, 2*HUDy, HUDMovAra);
-		renderText(HUDx, 3*HUDy, HUDMovCam);
-		renderText(HUDx, 4*HUDy, HUDRotCam);
-		renderText(HUDx, 5*HUDy, HUDLookAra);
-		renderText(HUDx, 6*HUDy, HUDRendMode);
-		renderText(HUDx, 7*HUDy, HUDCamMode);
-		renderText(HUDx, 8*HUDy, HUDFS);
-		renderText(HUDx, 9*HUDy, HUDExitFS);
-		renderText(HUDx, 10*HUDy, HUDClose);
+		renderText(HUDx, 2*HUDy, HUDCamMode);
+		renderText(HUDx, 3*HUDy, HUDRendMode);
+		renderText(HUDx, 4*HUDy, HUDFS);
+		renderText(HUDx, 5*HUDy, HUDExitFS);
+		renderText(HUDx, 6*HUDy, HUDClose);
+		if(freeCameraMode){
+			renderText(HUDx, 8*HUDy, HUDMovAra);
+			renderText(HUDx, 9*HUDy, HUDMovCam);
+			renderText(HUDx, 10*HUDy, HUDRotCam);
+			renderText(HUDx, 11*HUDy, HUDLookAra);
+		}
 	}
 
 	//Retornar Matriz
