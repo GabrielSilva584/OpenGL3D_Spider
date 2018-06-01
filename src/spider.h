@@ -49,6 +49,7 @@ class Spider : public DrawableObject{
             leg_l1, leg_l2, leg_l3, leg_l4;
         GLfloat animationTime, speed;
         GLboolean isAnimated, wireframeMode;
+        GLint directionRightAnimation, directionLeftAnimation;
 
         void drawEyes(GLfloat size, GLfloat angleZ, GLfloat angleY);
         

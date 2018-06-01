@@ -48,6 +48,9 @@ Spider::Spider(Point pos){
     speed = 0;
     isAnimated = false;
     wireframeMode = false;
+
+    directionRightAnimation = 1;
+    directionLeftAnimation = 1;
 }
 
 void Spider::update(GLfloat delta_temp){
@@ -69,14 +72,14 @@ void Spider::update(GLfloat delta_temp){
         //Invert Animation if walking backwards
         if(speed < 0) delta_temp *= -1;
 
-        leg_l1.update(delta_temp);
-        leg_l2.update(delta_temp);
-        leg_l3.update(delta_temp);
-        leg_l4.update(delta_temp);
-        leg_r1.update(delta_temp);
-        leg_r2.update(delta_temp);
-        leg_r3.update(delta_temp);
-        leg_r4.update(delta_temp);
+        leg_l1.update(directionLeftAnimation * delta_temp);
+        leg_l2.update(directionLeftAnimation * delta_temp);
+        leg_l3.update(directionLeftAnimation * delta_temp);
+        leg_l4.update(directionLeftAnimation * delta_temp);
+        leg_r1.update(directionRightAnimation * delta_temp);
+        leg_r2.update(directionRightAnimation * delta_temp);
+        leg_r3.update(directionRightAnimation * delta_temp);
+        leg_r4.update(directionRightAnimation * delta_temp);
         animationTime += delta_temp;
     } else {
         leg_l1.rest();
@@ -190,24 +193,40 @@ void Spider::toggleRenderMode(){
 
 void Spider::turnLeft(GLfloat delta_temp){
     rotate(TURN_SPEED*delta_temp);
+    isAnimated = true;
+    if(speed == 0){
+        directionLeftAnimation = -1;
+        directionRightAnimation = 1.5;
+    }
 }
 
 void Spider::turnRight(GLfloat delta_temp){
     rotate(-TURN_SPEED*delta_temp);
+    isAnimated = true;
+    if(speed == 0){
+        directionRightAnimation = -1;
+        directionLeftAnimation = 1.5;
+    }
 }
 
 void Spider::walkForward(GLfloat delta_temp){
     isAnimated = true;
     speed += ACCELERATION*delta_temp;
-    if(speed > MOVEMENT_SPEED)
+    if(speed > MOVEMENT_SPEED){
         speed = MOVEMENT_SPEED;
+        directionRightAnimation = 1;
+        directionLeftAnimation = 1;
+    }
 }
 
 void Spider::walkBackward(GLfloat delta_temp){
     isAnimated = true;
     speed -= ACCELERATION*delta_temp;
-    if(speed < -MOVEMENT_SPEED)
+    if(speed < -MOVEMENT_SPEED){
         speed = -MOVEMENT_SPEED;
+        directionRightAnimation = 1;
+        directionLeftAnimation = 1;
+    }
 }
 
 void Spider::toggleAnimation(){
