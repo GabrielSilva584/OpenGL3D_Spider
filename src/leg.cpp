@@ -136,22 +136,33 @@ void Leg::rest(){
 	}
 };
 
-void Leg::draw(){
+void Leg::draw(GLboolean wireframeMode){
 	glPushMatrix();
 
 	GLUquadric *cylinder = gluNewQuadric();
-	gluQuadricDrawStyle(cylinder, GLU_LINE);
+	if(wireframeMode){
+		gluQuadricDrawStyle(cylinder, GLU_LINE);
+	}
 
 	glTranslatef(a.getX(), a.getY(), a.getZ());
 	glRotatef(angleA, 0.0, 1.0, 0.0);
 	glRotatef(angleAx, 1.0, 0.0, 0.0);
 
-	glutWireSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);	
+	if(wireframeMode){
+		glutWireSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);	
+	}else {
+		glutSolidSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);
+	}
+
 	gluCylinder(cylinder,  LEG_RADIUS,  LEG_RADIUS,  sizeA,  DETAIL_RATE,  1);
 
 	glTranslatef(0.0, 0.0, sizeA);
 
-	glutWireSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);
+	if(wireframeMode){
+		glutWireSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);	
+	}else {
+		glutSolidSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);
+	}
 
 	glRotatef(angleBx, 1.0, 0.0, 0.0);
 
@@ -159,7 +170,11 @@ void Leg::draw(){
 
 	glTranslatef(0,0,sizeB);
 
-	glutWireSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);
+	if(wireframeMode){
+		glutWireSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);	
+	}else {
+		glutSolidSphere(LEG_RADIUS, DETAIL_RATE, DETAIL_RATE);
+	}
 
 	glPopMatrix();
 }

@@ -4,9 +4,9 @@
 #include <GL/glut.h>
 #include "point.h"
 
-#define ANIMATION_LOOP_TIME 1000
+#define ANIMATION_LOOP_TIME 500
 #define LEG_RADIUS 0.05
-#define DETAIL_RATE 30
+#define DETAIL_RATE 10
 
 class Leg{
     private:
@@ -23,7 +23,7 @@ class Leg{
             GLboolean leftLeg, GLboolean invertAnim);
         void update(GLfloat delta_ms);
         void rest();
-        void draw();
+        void draw(GLboolean wireframeMode);
         GLfloat halfBridgeRectifier(GLfloat number, GLfloat inferiorLimit);
 };
 

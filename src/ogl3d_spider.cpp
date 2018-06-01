@@ -1,251 +1,503 @@
-/**
- * @desc Programa que exibe uma pir�mide sob dois pontos de vista distintos.
- * @author Diego Cintra
- */
+//=======================================================================
+// Importações
+//=======================================================================
+
 #include <iostream>
 #include <GL/glut.h>
+#include <string.h>
 #include "point.h"
 #include "spider.h"
 
+//=======================================================================
+// Declarações
+//=======================================================================
+
+//Tamanho da tela
 int width = 1000;
 int height = 500;
 
-int gridSize = 50;
-int gridSpacing = 1;
+//Parâmetros do chão
+const int gridSize = 50;
+const int gridSpacing = 1;
 
-GLfloat FRAME_MS = 1000/30;
+//Modo de Câmera
+GLboolean freeCameraMode = true;
 
+//Movimento da Aranha
+GLboolean spiderTurnRight, spiderTurnLeft, spiderWalkFoward, spiderWalkBackward;
+
+//Movimento da Câmera
+GLboolean eyeTurnRight, eyeTurnLeft, eyeTurnUp, eyeTurnDown,
+		  eyeMoveForward, eyeMoveBackward, eyeMoveLeft, eyeMoveRight,
+		  lookAtSpider;
+
+const GLfloat EYE_TURN_SPEED  = 0.1, 
+			EYE_MOVEMENT_SPEED = 0.2;
+
+//Intervalo entre frames
+const GLfloat FRAME_MS = 1000/60;
+
+//Pontos da câmera
 Point eye = Point(3.0, 5.0, 5.0);
 Point target = Point(0.0, 0.0, 0.0);
 
+//Textos da HUD
+const GLchar *HUDHelp = "H = Exibir Comandos",
+		*HUDMovAra = "Setas = Mover Aranha",
+		*HUDMovCam = "WASD = Mover Camera",
+		*HUDRotCam = "IJKL = Rotacionar Camera",
+		*HUDLookAra = "Espaco = Olhar para Aranha",
+		*HUDRendMode = "R = Modo de Renderizacao",
+		*HUDCamMode = "M = Modo de Camera Livre",
+		*HUDFS = "F11 = Modo FullScreen",
+		*HUDExitFS = "ESC = Sair do Modo FullScreen",
+		*HUDClose = "Ctrl+D = Fechar";
+const GLfloat HUDx = 10, HUDy = 30;
+
+//Estado da HUD
+GLboolean exibirHUD = false;
+
+//A aranha
 Spider *spider;
 
-/**
- * @desc Desenha eixos de um sistema de coordenadas.
- * @param {float*} basePoint Ponto de origem de um sistema de coordenadas.
- * @param {float*} i Primeiro versor.
- * @param {float*} j Segundo versor.
- * @param {float*} k Terceiro versor.
- */
-void drawAxes(float *basePoint, float *i, float *j, float *k)
-{
+//Funções
+void keyPress(GLubyte key, GLint x, GLint y);
+void keyRelease(GLubyte key, GLint x, GLint y);
+void specialKeyPress(GLint key, GLint x, GLint y);
+void specialKeyRelease(GLint key, GLint x, GLint y);
+void renderText(GLfloat x, GLfloat y, const GLchar *string );
+void drawGround();
+void draw();
+void reshape(GLint w, GLint h);
+void update(GLint param);
+int main(int argc, char **argv);
+
+//=======================================================================
+// Entrada de teclado
+//=======================================================================
+
+//Apertar teclas normais
+void keyPress(GLubyte key, GLint x, GLint y){
+	GLint m = glutGetModifiers();
+
+	//fecha a janela com Ctrl+D
+	if(m == GLUT_ACTIVE_CTRL && (GLint) key == 4)
+		exit(EXIT_SUCCESS);
+
+	switch(key){
+		//Move a câmera com WASD
+		case 'w': case 'W':
+			eyeMoveForward = true;
+			break;
+		case 's': case 'S':
+			eyeMoveBackward = true;
+			break;
+		case 'a': case 'A':
+			eyeMoveLeft  = true;
+			break;
+		case 'd': case 'D':
+			eyeMoveRight  = true;
+			break;
+		
+		//Rotaciona a câmera com IJKL
+		case 'i': case 'I':
+			eyeTurnUp  = true;
+			break;
+		case 'k': case 'K':
+			eyeTurnDown  = true;
+			break;
+		case 'j': case 'J':
+			eyeTurnLeft  = true; 
+			break;
+		case 'l': case 'L':
+			eyeTurnRight  = true;
+			break;
+
+		//Altera modo de câmera
+		case 'm': case 'M':
+			freeCameraMode = !freeCameraMode;
+			break;
+
+		//Altera modo de renderização
+		case 'r': case 'R':
+			spider->toggleRenderMode();
+			break;
+
+		//Altera modo da HUD
+		case 'h': case 'H':
+			exibirHUD = !exibirHUD;
+			break;
+
+		//Olha para a aranha
+		case ' ':
+			lookAtSpider = true;
+			break;
+
+		//Restaura tamanho da janela (ESC)
+		case 27:
+			glutReshapeWindow(width, height);
+			break;
+	}
+}
+
+//Soltar teclas normais
+void keyRelease(GLubyte key, GLint x, GLint y){
+	switch(key){
+		//Move a câmera com WASD
+		case 'w': case 'W':
+			eyeMoveForward = false;
+			break;
+		case 's': case 'S':
+			eyeMoveBackward = false;
+			break;
+		case 'a': case 'A':
+			eyeMoveLeft  = false;
+			break;
+		case 'd': case 'D':
+			eyeMoveRight  = false;
+			break;
+
+		//Rotaciona a câmera com IJKL
+		case 'i': case 'I':
+			eyeTurnUp  = false;
+			break;
+		case 'k': case 'K':
+			eyeTurnDown  = false;
+			break;
+		case 'j': case 'J':
+			eyeTurnLeft  = false; 
+			break;
+		case 'l': case 'L':
+			eyeTurnRight  = false;
+			break;
+
+		//Olha para a aranha
+		case ' ':
+			lookAtSpider = false;
+			break;
+	}
+}
+
+//Apertar teclas especiais
+void specialKeyPress(GLint key, GLint x, GLint y){
+	switch(key){
+		//Entra no modo FullScreen
+		case GLUT_KEY_F11:
+			glutFullScreen();
+			break;
+
+		//Move a aranha com as setas
+		case GLUT_KEY_RIGHT:
+			spiderTurnRight = true;
+			break;
+		case GLUT_KEY_LEFT:
+			spiderTurnLeft = true;
+			break;
+		case GLUT_KEY_UP:
+			spiderWalkFoward = true;
+			break;
+		case GLUT_KEY_DOWN:
+			spiderWalkBackward = true;
+			break;
+	}
+	
+}
+
+//Soltar teclas especiais
+void specialKeyRelease(GLint key, GLint x, GLint y){
+	switch(key){
+		//Move a aranha com as setas
+		case GLUT_KEY_RIGHT:
+			spiderTurnRight = false;
+			break;
+		case GLUT_KEY_LEFT:
+			spiderTurnLeft = false;
+			break;
+		case GLUT_KEY_UP:
+			spiderWalkFoward = false;
+			break;
+		case GLUT_KEY_DOWN:
+			spiderWalkBackward = false;
+			break;
+	}
+}
+
+//=======================================================================
+// Renderização
+//=======================================================================
+
+//Renderiza um texto na tela
+void renderText(GLfloat x, GLfloat y, const GLchar *string ){
+	int j = strlen( string );
+ 
+	glColor3f(0.9, 0.4, 0.2);
+	glRasterPos2f( x, y );
+	for( int i = 0; i < j; i++ ) {
+		glutBitmapCharacter( GLUT_BITMAP_TIMES_ROMAN_24, string[i] );
+	}
+}
+
+//Desenha o chão quadriculado
+void drawGround(){
+	//Armazena cor atual
 	float currentColor[4];
-	/** Armazena cor atual */
 	glGetFloatv(GL_CURRENT_COLOR, currentColor);
 
-	//Desenho da GRID no plano XZ
-	//Desenha as linhas paralelas ao eixo Z
-	glColor3f(0,0,0);
-	for(int i=-gridSize; i<=gridSize; i+=gridSpacing){
-		glBegin(GL_LINES);
-		glVertex3f(-gridSize, 0, i);
-		glVertex3f(gridSize, 0, i);
-		glEnd();
+	//Armazena posição aproximada da aranha
+	GLint cX = GLint(spider->getX() + 0.5);
+	GLint cZ = GLint(spider->getZ() + 0.5);
+
+	//Desenha chão quadriculado ao redor da aranha
+	for(GLint i = (-gridSize + cX); i < (gridSize + cX); i += gridSpacing){
+		for(GLint j = (-gridSize + cZ); j < (gridSize + cZ); j += gridSpacing){
+			
+			GLfloat a = i - gridSpacing/2 - cX;
+			GLfloat b = j - gridSpacing/2 - cZ;
+			GLfloat d = sqrt( pow(a,2) + pow(b,2) );
+
+			if(d < gridSize){
+				if((i+j)%2 == 0){
+					glColor3f(0.9, 0.9, 0.9);
+				}else{
+					glColor3f(0.7, 0.7, 0.7);
+				}	
+				glBegin(GL_QUADS);
+						glVertex3f(i, 0, j);
+						glVertex3f(i+1, 0, j);
+						glVertex3f(i+1, 0, j+1);
+						glVertex3f(i, 0, j+1);
+				glEnd();
+			}
+		}
 	}
-	//Desenha as linhas paralelas ao eixo X
-	for(int i=-gridSize; i<=gridSize; i+=gridSpacing){
-		glBegin(GL_LINES);
-		glVertex3f(i, 0, -gridSize);
-		glVertex3f(i, 0, gridSize);
-		glEnd();
-	}
 
-
-	/** Desenha versores */
-	glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_LINES);
-		glVertex3f(basePoint[0], basePoint[1], basePoint[2]);
-		glVertex3f(i[0], i[1], i[2]);
-	glEnd();
-	glColor3f(0.0, 1.0, 0.0);
-	glBegin(GL_LINES);
-		glVertex3f(basePoint[0], basePoint[1], basePoint[2]);
-		glVertex3f(j[0], j[1], j[2]);
-	glEnd();
-	glColor3f(0.0, 0.0, 1.0);
-	glBegin(GL_LINES);
-		glVertex3f(basePoint[0], basePoint[1], basePoint[2]);
-		glVertex3f(k[0], k[1], k[2]);
-	glEnd();
-
-	/** Retorna para cor anterior */
+	//Retorna para cor anterior
 	glColor3f(currentColor[0], currentColor[1], currentColor[2]);
 }
 
-/**
- * @desc Desenha as coordenadas globais.
- */
-void drawWCAxes()
-{
-	float *basePoint, *i, *j, *k;
-	basePoint = new float[3];
-	basePoint[0] = basePoint[1] = basePoint[2] = 0.0;
-	i = new float[3];
-	i[0] = 5.0;
-	i[1] = i[2] = 0.0;
-	j = new float[3];
-	j[0] = j[2] = 0.0;
-	j[1] = 5.0;
-	k = new float[3];
-	k[0] = k[1] = 0.0;
-	k[2] = 5.0;
-	drawAxes(basePoint, i, j, k);
-}
-
-/**
- * @desc Fun��o de callback para desenho na tela.
- */
-void displayCallback()
-{
-	/** Limpa a janela APENAS uma vez */
-	glClear(GL_COLOR_BUFFER_BIT);
+//Função de callback para desenho na tela.
+void draw(){
+	//Limpa a janela
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	Point p = Point(0,0,1);
 	Point r = Point(1,0,0);
 	Point o = Point(0,0,2);
 
 	glColor3f(0.0f, 0.0f, 0.0f);
-	/** Desenha a janela mais a esquerda */
+	
+	if(!freeCameraMode){
+		//Desenha a janela do canto inferior esquerdo
+		glViewport(0, 0, width/2, height/2);
+		glLoadIdentity();
+		gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
+		drawGround();
+		spider->draw();
+
+		//Desenha a janela do canto inferior direito
+		glViewport(width/2, 0, width/2, height/2);
+		glLoadIdentity();
+		gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
+		drawGround();
+		spider->draw();
+
+		//Desenha a janela do canto superior esquerdo
+		glViewport(0, height/2, width/2, height/2);
+		glLoadIdentity();
+		gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
+		drawGround();
+		spider->draw();
+
+		//Desenha a janela do canto superior direito
+		glViewport(width/2, height/2, width/2, height/2);
+		glLoadIdentity();
+		gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
+		drawGround();
+		spider->draw();
+	}else {
+		//Desenha a janela completa
+		glViewport(0, 0, width, height);
+		glLoadIdentity();
+		gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
+		drawGround();
+		spider->draw();
+	}
+
+	//Desenhar HUD 2D
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
 	glViewport(0, 0, width, height);
 	glLoadIdentity();
-	gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
-	drawWCAxes();
-	/*glBegin(GL_POINTS);
-		glVertex3f(p.getX(), p.getY(), p.getZ());
-	glEnd();
-	GLUquadric *cylinder = gluNewQuadric();
-	gluQuadricDrawStyle(cylinder, GLU_LINE);
-	gluCylinder(cylinder,  1,  1,  3,  30,  1);
-	*/
-	/** Desenha a janela mais a direita */
-	//glViewport(width/2, 0, width/2, height);
-	/*glLoadIdentity();
-	gluLookAt(eye.getX(), eye.getY(), eye.getZ(), target.getX(), target.getY(), target.getZ(), 0.0, 1.0, 0.0);
-	drawWCAxes();
-	p.rotate(o, 90, r);
-	glBegin(GL_POINTS);
-		glVertex3f(p.getX(), p.getY(), p.getZ());
-	glEnd();
-	glutWireSphere(0.1, 30, 30);
-	GLUquadric *cylinder = gluNewQuadric();
-	gluQuadricDrawStyle(cylinder, GLU_LINE);
-	gluCylinder(cylinder,  0.1,  0.1,  3,  30,  1);
-	glTranslatef(0,0,3);
-	glutWireSphere(0.1, 30, 30);
-	glRotatef(45,1,0,0);
-	gluCylinder(cylinder,  0.1,  0.1,  3,  30,  1);
-	glTranslatef(0,0,3);
-	glutWireSphere(0.1, 30, 30);*/
-	spider->draw();
+	glOrtho(0.0, width, height, 0.0, -1.0, 10.0);
+	glMatrixMode(GL_MODELVIEW);
 
-	/** Dispara os comandos APENAS uma vez */
-	glFlush();
+	glLoadIdentity();
+	glDisable(GL_CULL_FACE);
+
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	renderText(HUDx, HUDy, HUDHelp);
+
+	if(exibirHUD){
+		renderText(HUDx, 2*HUDy, HUDMovAra);
+		renderText(HUDx, 3*HUDy, HUDMovCam);
+		renderText(HUDx, 4*HUDy, HUDRotCam);
+		renderText(HUDx, 5*HUDy, HUDLookAra);
+		renderText(HUDx, 6*HUDy, HUDRendMode);
+		renderText(HUDx, 7*HUDy, HUDCamMode);
+		renderText(HUDx, 8*HUDy, HUDFS);
+		renderText(HUDx, 9*HUDy, HUDExitFS);
+		renderText(HUDx, 10*HUDy, HUDClose);
+	}
+
+	//Retornar Matriz
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+
+	//Troca de Buffer
+	glutSwapBuffers();
 }
 
-/**
- * @desc Fun��o de callback para reshape.
- * @param {int} w Nova largura da janela.
- * @param {int} h Nova altura da janela.
- */
-void reshapeCallback(int w, int h)
-{
-	/** Atualiza os valores da janela */
+//Função de callback para reshape.
+void reshape(GLint w, GLint h){
+	//Atualiza os valores da janela
 	width = w;
 	height = h;
-	/** Define o volume de vista */
+
+	//Define o volume de vista
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(65.0, (GLfloat) width/(GLfloat) height, 0.0001, 50.0);
+	gluPerspective(65.0, GLfloat(width)/height, 0.01, 150.0);
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void keybord_keypress(GLubyte key, GLint x, GLint y){
-	GLint m = glutGetModifiers();
-
-	//FECHA A JANELA AO APERTAR CTRL+D
-	if(m == GLUT_ACTIVE_CTRL && (GLint) key == 4)
-		exit(EXIT_SUCCESS);
-
-	if (key == 't' || key == 'T'){
-		spider->toggleAnimation();
-	}
-
-	if (key == 'w' || key == 'W'){
-		target.setY(target.getY() + 0.1);
-	}
-	if (key == 's' || key == 'S'){
-		target.setY(target.getY() - 0.1);
-	}
-	if (key == 'a' || key == 'A'){
-		target.rotate(eye, 2.5, Point(0,1,0));
-	}
-	if (key == 'd' || key == 'D'){
-		target.rotate(eye, -2.5, Point(0,1,0));
-	}
-
-	//Reset target
-	if (key == ' '){
-		target = Point(0,0,0);
-	}
-
-	//ESC = 27
-	if (key == 27){
-		glutReshapeWindow(width, height);
-	}
-}
-
-void keybord_special_keypress(GLint key, GLint x, GLint y){
-	if(key == GLUT_KEY_F11){
-		glutFullScreen();
-	}
-
-	if (key == GLUT_KEY_RIGHT){
-		eye.rotate(target, 5, Point(0,1,0));
-	}
-	if (key == GLUT_KEY_LEFT){
-		eye.rotate(target, -5, Point(0,1,0));
-	}
-	if (key == GLUT_KEY_UP){
-		eye.setY(eye.getY() + 0.1);
-		target.setY(target.getY() + 0.1);
-	}
-	if (key == GLUT_KEY_DOWN){
-		eye.setY(eye.getY() - 0.1);
-		target.setY(target.getY() - 0.1);
-	}
-}
+//=======================================================================
+// Atualizar estados
+//=======================================================================
 
 void update(GLint param){
-    //update spider here (move/animate)
+	//Pontos de referência
+	Point o, d, p, f;
+	
+	o = Point(0.0, 0.0, 0.0);
+	d = Point(0.0, 1.0, 0.0);
+	p = Point(target.getX() - eye.getX(), 0.0, target.getZ() - eye.getZ());
+	f = Point(target.getX() - eye.getX(),
+			target.getY() - eye.getY(),
+			target.getZ() - eye.getZ());
+	p.rotate(o, 90, d);
+	f.normalize();
+	p.normalize();
+
+	//Rotação do Olho
+	if(eyeTurnUp){
+		target.rotate(eye, -EYE_TURN_SPEED * FRAME_MS, p);
+		if(abs(target.getX() - eye.getX()) < 0.1 )
+			target.rotate(eye, -EYE_TURN_SPEED * FRAME_MS, p);
+	}
+	if(eyeTurnDown){
+		target.rotate(eye, EYE_TURN_SPEED * FRAME_MS, p);
+		if(abs(target.getX() - eye.getX()) < 0.1 )
+			target.rotate(eye, EYE_TURN_SPEED * FRAME_MS, p);
+	}
+	if(eyeTurnLeft){
+		target.rotate(eye, EYE_TURN_SPEED * FRAME_MS, d);
+	}
+	if(eyeTurnRight){
+		target.rotate(eye, -EYE_TURN_SPEED * FRAME_MS, d);
+	}
+
+	//Movimento do Olho
+	if(eyeMoveForward){
+		eye.move(EYE_MOVEMENT_SPEED * f.getX(), 
+				EYE_MOVEMENT_SPEED * f.getY(), 
+				EYE_MOVEMENT_SPEED * f.getZ());
+		target.move(EYE_MOVEMENT_SPEED * f.getX(), 
+				EYE_MOVEMENT_SPEED * f.getY(), 
+				EYE_MOVEMENT_SPEED * f.getZ());
+	}
+	if(eyeMoveBackward){
+		eye.move(-EYE_MOVEMENT_SPEED * f.getX(), 
+				-EYE_MOVEMENT_SPEED * f.getY(), 
+				-EYE_MOVEMENT_SPEED * f.getZ());
+		target.move(-EYE_MOVEMENT_SPEED * f.getX(), 
+				-EYE_MOVEMENT_SPEED * f.getY(), 
+				-EYE_MOVEMENT_SPEED * f.getZ());
+	}
+	if(eyeMoveLeft){
+		eye.move(EYE_MOVEMENT_SPEED * p.getX(), 
+				EYE_MOVEMENT_SPEED * p.getY(), 
+				EYE_MOVEMENT_SPEED * p.getZ());
+		target.move(EYE_MOVEMENT_SPEED * p.getX(), 
+				EYE_MOVEMENT_SPEED * p.getY(), 
+				EYE_MOVEMENT_SPEED * p.getZ());
+	}
+	if(eyeMoveRight){
+		eye.move(-EYE_MOVEMENT_SPEED * p.getX(), 
+				-EYE_MOVEMENT_SPEED * p.getY(), 
+				-EYE_MOVEMENT_SPEED * p.getZ());
+		target.move(-EYE_MOVEMENT_SPEED * p.getX(), 
+				-EYE_MOVEMENT_SPEED * p.getY(), 
+				-EYE_MOVEMENT_SPEED * p.getZ());
+	}
+
+	if(lookAtSpider)
+		target = Point(spider->getX(), spider->getY(), spider->getZ());
+
+	//Movimento da Aranha
+	if(spiderWalkFoward)	
+		spider->walkForward(FRAME_MS);
+	if(spiderWalkBackward)	
+		spider->walkBackward(FRAME_MS);
+	if(spiderTurnLeft)	
+		spider->turnLeft(FRAME_MS);
+	if(spiderTurnRight)
+		spider->turnRight(FRAME_MS);
+
+	//Atualizar aranha
     spider->update(FRAME_MS);
 
+	//Chamar próximo frame
     glutTimerFunc(FRAME_MS, update, 0);
+
+	//Desenhar novo frame
     glutPostRedisplay();
 }
 
+//=======================================================================
+// Main
+//=======================================================================
 
-int main(int argc, char **argv)
-{
-	/** Passo 1: Inicializa fun��es GLUT */
+int main(int argc, char **argv){
+	//Inicializar funções GLUT
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	glutInitWindowPosition(100, 100);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
 	glutInitWindowSize(width, height);
+	glutInitWindowPosition(100, 100);
 	glutCreateWindow("Aranha 3D");
+
+	//Configurar OpenGL
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+	//Criar Aranha
 	spider = new Spider(Point(0,1,0));
 
-	/** Passo 2: Registra callbacks da OpenGl */
-	glutDisplayFunc(displayCallback);
-	glutReshapeFunc(reshapeCallback);
+	//Registrar callbacks
+	glutDisplayFunc(draw);
+	glutReshapeFunc(reshape);
 
-	glutKeyboardFunc(keybord_keypress);
-	glutSpecialFunc(keybord_special_keypress);
+	glutKeyboardFunc(keyPress);
+	glutKeyboardUpFunc(keyRelease);
+	glutSpecialFunc(specialKeyPress);
+	glutSpecialUpFunc(specialKeyRelease);
 
 	glutTimerFunc(FRAME_MS, update, 0);
 
-	/** Passo 3: Executa o programa */
+	//Executar o programa
 	glutMainLoop();
 	return 0;
 }

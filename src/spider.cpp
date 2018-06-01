@@ -9,7 +9,6 @@ Spider::Spider(Point pos){
     o = Point(0.0, 0.0, 0.0);
 
     this->pos = pos;
-    this->destiny = pos;
 
     tmp = Point(0, 0, BODY_SIZE1);
 
@@ -46,48 +45,28 @@ Spider::Spider(Point pos){
     leg_r4 = Leg(tmp2, LEG4_ANGLEA, LEG_ANGLEAX, LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, false, false);
 
     animationTime = 0;
-    isAnimated = true;
-}
-
-void Spider::walkTo(Point destiny){
-    this->destiny = destiny;
+    wireframeMode = false;
 }
 
 void Spider::update(GLfloat delta_temp){
-    /*if(GLint(pos.getX() + tx) != destiny.getX() || GLint(pos.getY() + ty) != destiny.getY()){
-        
-        //calculando valor unitário de direção
-        GLfloat dx = destiny.getX() - pos.getX() - tx;
-        GLfloat dy = destiny.getY() - pos.getY() - ty;
-        GLfloat h = sqrt( pow(dx,2) + pow(dy,2) );
-        direction = Point(dx/h, dy/h);
-        
-        //ângulo entre posição atual e destino
-        GLfloat angle = acos(dx/h)*180/PI;
-        if(dy > 0) angle = 360 - angle;
-        
-        GLint turn_dir = GLint(angle)%360 - GLint(rot + 90)%360;
-        
-        if(turn_dir != 0){ //virar
-            
-            //manter turn_dir entre -180 e 180
-            if(turn_dir > 180) turn_dir -= 360;
-            else if(turn_dir < -180) turn_dir += 360;
-            
-            //decidindo direção para virar
-            if(turn_dir >= TURN_SPEED) rotate(TURN_SPEED);
-            else if(turn_dir <= -TURN_SPEED) rotate(-TURN_SPEED);
-            else rotate(turn_dir);
-        
-        }else{ //andar
-            if(h < MOVEMENT_SPEED)
-                translate(h*direction.getX(), h*direction.getY());
-            else
-                translate(MOVEMENT_SPEED*direction.getX(), MOVEMENT_SPEED*direction.getY());
-        }
-    }*/      
-        //atualizar pernas
+    if(speed!=0){
+        Point p = Point(1.0, 0.0, 0.0);
+        Point o = Point(0.0, 0.0, 0.0);
+        Point d = Point(0.0, 1.0, 0.0);
+        p.rotate(o, rot_y, d);
+
+        GLfloat movX, movZ;
+        movX = p.getX()*speed*delta_temp;
+        movZ = p.getZ()*speed*delta_temp;
+
+        translate(movX, 0.0, movZ);
+    }
+    
+    //Animate legs
     if(isAnimated){
+        //Invert Animation if walking backwards
+        if(speed < 0) delta_temp *= -1;
+
         leg_l1.update(delta_temp);
         leg_l2.update(delta_temp);
         leg_l3.update(delta_temp);
@@ -107,40 +86,128 @@ void Spider::update(GLfloat delta_temp){
         leg_r3.rest();
         leg_r4.rest();
     }
-    
 
+    //Deaccelerate
+    if(speed > DEACCELERATION){
+        speed -= DEACCELERATION;
+    }else if(speed < -DEACCELERATION){
+        speed += DEACCELERATION;
+    }else{
+        speed = 0;
+        isAnimated = false;
+    }
 }
 
 void Spider::draw(){
     glPushMatrix();
 
+    glColor3f(0.0, 0.0, 0.0);
     glTranslatef(pos.getX() + tx, pos.getY() + ty, pos.getZ() + tz);
     glRotatef(rot_y, 0.0, 1.0, 0.0);
     glScalef(sx, sy, sz);
 
-    leg_r1.draw();
-    leg_l1.draw();
-    leg_r2.draw();
-    leg_l2.draw();
-    leg_r3.draw();
-    leg_l3.draw();
-    leg_r4.draw();
-    leg_l4.draw();
+    leg_r1.draw(wireframeMode);
+    leg_l1.draw(wireframeMode);
+    leg_r2.draw(wireframeMode);
+    leg_l2.draw(wireframeMode);
+    leg_r3.draw(wireframeMode);
+    leg_l3.draw(wireframeMode);
+    leg_r4.draw(wireframeMode);
+    leg_l4.draw(wireframeMode);
 
-    glutWireSphere(BODY_SIZE1, DETAIL_RATE, DETAIL_RATE);
+    if(wireframeMode){
+        glutWireSphere(BODY_SIZE1, DETAIL_RATE, DETAIL_RATE);
+    }else {
+        glutSolidSphere(BODY_SIZE1, DETAIL_RATE, DETAIL_RATE);
+    }
 
     glTranslatef(-BODY_INTERSECTION*(BODY_SIZE1+BODY_SIZE2), 0.0, 0.0);
 
-    glutWireSphere(BODY_SIZE2, DETAIL_RATE, DETAIL_RATE);
+    if(wireframeMode){
+        glutWireSphere(BODY_SIZE2, DETAIL_RATE, DETAIL_RATE);
+    }else {
+        glutSolidSphere(BODY_SIZE2, DETAIL_RATE, DETAIL_RATE);
+    }
 
-    glTranslatef(BODY_INTERSECTION*(BODY_SIZE1+BODY_SIZE2), 0.0, 0.0);
+    glPopMatrix();
+
+    drawEyes(EYE_SIZE1, EYE_ANGLEZ1, EYE_ANGLEY1);
+    drawEyes(EYE_SIZE1, EYE_ANGLEZ2, EYE_ANGLEY2);
+    drawEyes(EYE_SIZE2, EYE_ANGLEZ3, EYE_ANGLEY3);
+    drawEyes(EYE_SIZE2, EYE_ANGLEZ4, EYE_ANGLEY4);
+}
+
+void Spider::drawEyes(GLfloat size, GLfloat angleZ, GLfloat angleY){
+    glPushMatrix();
+
+    glColor3f(0.7, 0.1, 0.1);
+    glTranslatef(pos.getX() + tx, pos.getY() + ty, pos.getZ() + tz);
+    glRotatef(rot_y, 0.0, 1.0, 0.0);
+    glScalef(sx, sy, sz);
+
+    glRotatef(angleY, 0.0, 1.0, 0.0);
+    glRotatef(angleZ, 0.0, 0.0, 1.0);
+    glTranslatef(BODY_SIZE1 - size/2, 0.0, 0.0);
+
+    if(wireframeMode){
+        glutWireSphere(size, DETAIL_RATE/2, DETAIL_RATE/2);
+    }else {
+        glutSolidSphere(size, DETAIL_RATE/2, DETAIL_RATE/2);
+    }
+
+    glTranslatef(-(BODY_SIZE1 - size/2), 0.0, 0.0);
+    glRotatef(-angleZ, 0.0, 0.0, 1.0);
+    glRotatef(-2*angleY, 0.0, 1.0, 0.0);
+    glRotatef(angleZ, 0.0, 0.0, 1.0);
+    glTranslatef(BODY_SIZE1 - size/2, 0.0, 0.0);
+
+    if(wireframeMode){
+        glutWireSphere(size, DETAIL_RATE/2, DETAIL_RATE/2);
+    }else {
+        glutSolidSphere(size, DETAIL_RATE/2, DETAIL_RATE/2);
+    }
 
     glPopMatrix();
 }
 
+GLfloat Spider::getX(){
+    return pos.getX() + tx;
+}
+
+GLfloat Spider::getY(){
+    return pos.getY() + ty;
+}
+
+GLfloat Spider::getZ(){
+    return pos.getZ() + tz;
+}
+
+void Spider::toggleRenderMode(){
+    wireframeMode = !wireframeMode;
+}
+
+void Spider::turnLeft(GLfloat delta_temp){
+    rotate(TURN_SPEED*delta_temp);
+}
+
+void Spider::turnRight(GLfloat delta_temp){
+    rotate(-TURN_SPEED*delta_temp);
+}
+
+void Spider::walkForward(GLfloat delta_temp){
+    isAnimated = true;
+    speed += ACCELERATION*delta_temp;
+    if(speed > MOVEMENT_SPEED)
+        speed = MOVEMENT_SPEED;
+}
+
+void Spider::walkBackward(GLfloat delta_temp){
+    isAnimated = true;
+    speed -= ACCELERATION*delta_temp;
+    if(speed < -MOVEMENT_SPEED)
+        speed = -MOVEMENT_SPEED;
+}
+
 void Spider::toggleAnimation(){
-    if(isAnimated) 
-        isAnimated = false;
-    else
-        isAnimated = true;
+    isAnimated = !isAnimated;
 }

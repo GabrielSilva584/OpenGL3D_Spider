@@ -17,14 +17,11 @@ class Point{
         void translate(GLfloat delX, GLfloat delY, GLfloat delZ);
         void rotate(Point O, GLfloat rad, Point dir);
 
-        //Sets e Gets úteis
-        void setX(GLfloat x);
-        void setY(GLfloat y);
-        void setZ(GLfloat z);
+        void move(GLfloat x, GLfloat y, GLfloat z);
         GLfloat getX();
         GLfloat getY();
         GLfloat getZ();
-        void print();
+        void normalize();
 };
 
 #endif

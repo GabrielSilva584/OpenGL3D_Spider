@@ -91,16 +91,10 @@ void Point::rotate(Point O, GLfloat deg, Point dir){
 
 }
 
-void Point::setX(GLfloat x){
-    X = x;
-}
-
-void Point::setY(GLfloat y){
-    Y = y;
-}
-
-void Point::setZ(GLfloat z){
-    Z = z;
+void Point::move(GLfloat x, GLfloat y, GLfloat z){
+    X += x;
+    Y += y;
+    Z += z;
 }
 
 GLfloat Point::getX(){
@@ -115,6 +109,10 @@ GLfloat Point::getZ(){
     return Z;
 }
 
-void Point::print(){
-    std::cout << "P( " << X << ", " << Y << ", " << Z << ")\n";
+void Point::normalize(){
+    GLfloat s = sqrt( pow(X,2) + pow(Y,2) + pow(Z,2) );
+    if(s == 0) return;
+    X /= s;
+    Y /= s;
+    Z /= s;
 }
