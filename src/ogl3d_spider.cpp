@@ -25,12 +25,15 @@ const int gridSpacing = 1;
 GLboolean freeCameraMode = false;
 
 //Movimento da Aranha
-GLboolean spiderTurnRight, spiderTurnLeft, spiderWalkFoward, spiderWalkBackward;
+GLboolean spiderTurnRight = false, spiderTurnLeft = false, 
+		spiderWalkFoward = false, spiderWalkBackward = false;
 
 //Movimento da Câmera
-GLboolean eyeTurnRight, eyeTurnLeft, eyeTurnUp, eyeTurnDown,
-		  eyeMoveForward, eyeMoveBackward, eyeMoveLeft, eyeMoveRight,
-		  lookAtSpider;
+GLboolean eyeTurnRight = false, eyeTurnLeft = false, 
+		eyeTurnUp = false, eyeTurnDown = false,
+		eyeMoveForward = false, eyeMoveBackward = false, 
+		eyeMoveLeft = false, eyeMoveRight = false,
+		lookAtSpider = false;
 
 const GLfloat EYE_TURN_SPEED  = 0.1,
 			EYE_MOVEMENT_SPEED = 0.2;

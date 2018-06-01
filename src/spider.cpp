@@ -45,6 +45,8 @@ Spider::Spider(Point pos){
     leg_r4 = Leg(tmp2, LEG4_ANGLEA, LEG_ANGLEAX, LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, false, false);
 
     animationTime = 0;
+    speed = 0;
+    isAnimated = false;
     wireframeMode = false;
 }
 
