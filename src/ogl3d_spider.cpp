@@ -5,6 +5,7 @@
 #include <iostream>
 #include <GL/glut.h>
 #include <string.h>
+#include <assert.h>
 #include "point.h"
 #include "spider.h"
 
@@ -268,10 +269,10 @@ void drawGround(){
 					glColor3f(0.7, 0.7, 0.7);
 				}	
 				glBegin(GL_QUADS);
-						glVertex3f(i, 0, j);
-						glVertex3f(i+1, 0, j);
-						glVertex3f(i+1, 0, j+1);
-						glVertex3f(i, 0, j+1);
+					glVertex3f(i, 0, j);
+					glVertex3f(i+1, 0, j);
+					glVertex3f(i+1, 0, j+1);
+					glVertex3f(i, 0, j+1);
 				glEnd();
 			}
 		}
@@ -366,8 +367,7 @@ void draw(){
 	glMatrixMode(GL_MODELVIEW);
 
 	//Troca de Buffer
-	//glutSwapBuffers();
-	glFlush();
+	glutSwapBuffers();
 }
 
 //Função de callback para reshape.
@@ -483,7 +483,7 @@ void update(GLint param){
 int main(int argc, char **argv){
 	//Inicializar funções GLUT
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_DEPTH | GLUT_RGB);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA);
 	glutInitWindowSize(width, height);
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow("Aranha 3D");
@@ -491,7 +491,7 @@ int main(int argc, char **argv){
 	//Configurar OpenGL
 	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
+	glDepthFunc(GL_LESS);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	//Criar Aranha

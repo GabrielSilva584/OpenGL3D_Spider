@@ -14,11 +14,11 @@ Spider::Spider(Point pos){
 
     tmp2 = tmp;
     tmp2.rotate(o, 180-LEG1_ANGLEA, Point(0.0, 1.0, 0.0));
-    leg_l1 = Leg(tmp2, LEG1_ANGLEA, 180-LEG_ANGLEAX, -LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, true, false);
+    leg_l1 = Leg(tmp2, LEG1_ANGLEA, 180-LEG_ANGLEAX, -LEG_ANGLEBX, LEG_SIZEA1, LEG_SIZEB1, true, false);
 
     tmp2 = tmp;
     tmp2.rotate(o, LEG1_ANGLEA, Point(0.0, 1.0, 0.0));
-    leg_r1 = Leg(tmp2, LEG1_ANGLEA, LEG_ANGLEAX, LEG_ANGLEBX, LEG_SIZEA, LEG_SIZEB, false, true);
+    leg_r1 = Leg(tmp2, LEG1_ANGLEA, LEG_ANGLEAX, LEG_ANGLEBX, LEG_SIZEA1, LEG_SIZEB1, false, true);
 
     tmp2 = tmp;
     tmp2.rotate(o, 180-LEG2_ANGLEA, Point(0.0, 1.0, 0.0));
@@ -61,7 +61,7 @@ void Spider::update(GLfloat delta_temp){
 
         translate(movX, 0.0, movZ);
     }
-    
+
     //Animate legs
     if(isAnimated){
         //Invert Animation if walking backwards
