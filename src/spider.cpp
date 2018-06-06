@@ -140,17 +140,17 @@ void Spider::draw(){
 
     //Desenhar corpo
     if(wireframeMode){
-        glutWireSphere(BODY_SIZE1, DETAIL_RATE, DETAIL_RATE);
+        glutWireSphere(BODY_SIZE1, DETAIL_RATE*2, DETAIL_RATE*2);
     }else {
-        glutSolidSphere(BODY_SIZE1, DETAIL_RATE, DETAIL_RATE);
+        glutSolidSphere(BODY_SIZE1, DETAIL_RATE*2, DETAIL_RATE*2);
     }
 
     glTranslatef(-BODY_INTERSECTION*(BODY_SIZE1+BODY_SIZE2), 0.0, 0.0);
 
     if(wireframeMode){
-        glutWireSphere(BODY_SIZE2, DETAIL_RATE, DETAIL_RATE);
+        glutWireSphere(BODY_SIZE2, DETAIL_RATE*2, DETAIL_RATE*2);
     }else {
-        glutSolidSphere(BODY_SIZE2, DETAIL_RATE, DETAIL_RATE);
+        glutSolidSphere(BODY_SIZE2, DETAIL_RATE*2, DETAIL_RATE*2);
     }
 
     glPopMatrix();
@@ -176,9 +176,9 @@ void Spider::drawEyes(GLfloat size, GLfloat angleZ, GLfloat angleY){
     glTranslatef(BODY_SIZE1 - size/2, 0.0, 0.0);
 
     if(wireframeMode){
-        glutWireSphere(size, DETAIL_RATE/2, DETAIL_RATE/2);
+        glutWireSphere(size, DETAIL_RATE, DETAIL_RATE);
     }else {
-        glutSolidSphere(size, DETAIL_RATE/2, DETAIL_RATE/2);
+        glutSolidSphere(size, DETAIL_RATE, DETAIL_RATE);
     }
 
     glTranslatef(-(BODY_SIZE1 - size/2), 0.0, 0.0);
@@ -188,9 +188,9 @@ void Spider::drawEyes(GLfloat size, GLfloat angleZ, GLfloat angleY){
     glTranslatef(BODY_SIZE1 - size/2, 0.0, 0.0);
 
     if(wireframeMode){
-        glutWireSphere(size, DETAIL_RATE/2, DETAIL_RATE/2);
+        glutWireSphere(size, DETAIL_RATE, DETAIL_RATE);
     }else {
-        glutSolidSphere(size, DETAIL_RATE/2, DETAIL_RATE/2);
+        glutSolidSphere(size, DETAIL_RATE, DETAIL_RATE);
     }
 
     glPopMatrix();
